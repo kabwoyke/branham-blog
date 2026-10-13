@@ -218,6 +218,68 @@ class ArticleAdminTest extends TestCase
             ->set('category', (string) $this->category->id)->assertSee($match->title)->assertDontSee($other->title);
     }
 
+    public function test_supporting_image_is_stored_and_markdown_is_dispatched_to_the_editor(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test(Form::class)
+            ->set('bodyImage', UploadedFile::fake()->image('chart.png', 2000, 900))
+            ->set('bodyImageAlt', 'A chart of growth')
+            ->set('bodyImageCaption', 'Growth, "2020" to 2026')
+            ->call('insertBodyImage')
+            ->assertHasNoErrors()
+            ->assertDispatched('markdown-insert', function (string $event, array $params): bool {
+                return $params['editor'] === 'body'
+                    && str_contains($params['markdown'], '![A chart of growth](/storage/articles/body/')
+                    && str_contains($params['markdown'], ".webp \"Growth, '2020' to 2026\")");
+            })
+            ->assertSet('bodyImage', null)
+            ->assertSet('bodyImageAlt', '');
+
+        $this->assertCount(1, Storage::disk('public')->files('articles/body'));
+    }
+
+    public function test_supporting_image_needs_alt_text_and_a_file(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test(Form::class)
+            ->set('bodyImage', UploadedFile::fake()->image('chart.png'))
+            ->call('insertBodyImage')
+            ->assertHasErrors('bodyImageAlt')
+            ->assertNotDispatched('markdown-insert');
+
+        Livewire::test(Form::class)
+            ->set('bodyImageAlt', 'Alt')
+            ->call('insertBodyImage')
+            ->assertHasErrors('bodyImage');
+
+        $this->assertCount(0, Storage::disk('public')->allFiles());
+    }
+
+    public function test_supporting_image_rejects_non_images(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test(Form::class)
+            ->set('bodyImage', UploadedFile::fake()->create('doc.pdf', 10, 'application/pdf'))
+            ->assertHasErrors('bodyImage')
+            ->assertSet('bodyImage', null);
+    }
+
+    public function test_alt_text_cannot_break_out_of_the_markdown_image_syntax(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test(Form::class)
+            ->set('bodyImage', UploadedFile::fake()->image('a.png'))
+            ->set('bodyImageAlt', "Bad] (javascript:alert(1)\n[x")
+            ->call('insertBodyImage')
+            ->assertDispatched('markdown-insert', function (string $event, array $params): bool {
+                return str_starts_with($params['markdown'], "\n\n![Bad  (javascript:alert(1)  x](/storage/");
+            });
+    }
+
     public function test_non_admin_cannot_mutate_via_components(): void
     {
         $article = Article::factory()->create();

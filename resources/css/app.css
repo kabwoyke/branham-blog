@@ -57,7 +57,7 @@
 }
 
 @utility prose-article {
-    @apply prose max-w-[68ch] text-lg leading-relaxed;
+    @apply prose max-w-[68ch] text-lg leading-relaxed prose-img:rounded-xl prose-figcaption:text-center;
     --tw-prose-body: var(--color-ink);
     --tw-prose-headings: var(--color-ink);
     --tw-prose-lead: var(--color-muted);

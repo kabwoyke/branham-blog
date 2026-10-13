@@ -28,6 +28,31 @@ class MarkdownTest extends TestCase
         $this->assertStringNotContainsString('onerror', $html);
     }
 
+    public function test_image_with_a_title_becomes_a_captioned_figure(): void
+    {
+        $html = Markdown::toHtml('![A busy street](/storage/a.webp "Rush hour, 2026")');
+
+        $this->assertStringContainsString('<figure><img', $html);
+        $this->assertStringContainsString('alt="A busy street"', $html);
+        $this->assertStringContainsString('<figcaption>Rush hour, 2026</figcaption></figure>', $html);
+        $this->assertStringNotContainsString('title=', $html);
+    }
+
+    public function test_image_without_a_caption_stays_a_plain_lazy_image(): void
+    {
+        $html = Markdown::toHtml('![Plain](/storage/b.webp)');
+
+        $this->assertStringNotContainsString('<figure', $html);
+        $this->assertStringContainsString('loading="lazy"', $html);
+    }
+
+    public function test_captions_are_escaped(): void
+    {
+        $html = Markdown::toHtml('![x](/a.webp "<b>bold</b> & more")');
+
+        $this->assertStringNotContainsString('<b>', $html);
+    }
+
     public function test_article_exposes_rendered_body(): void
     {
         $article = Article::factory()->create(['body' => 'Hello *world*']);

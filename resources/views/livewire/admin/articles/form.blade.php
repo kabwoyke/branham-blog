@@ -10,6 +10,23 @@
             <x-admin.input label="Slug" name="slug" wire:model.blur="slug" hint="Used in the article address. Generated from the title; edit if you wish." required />
             <x-admin.textarea label="Excerpt" name="excerpt" wire:model="excerpt" rows="3" hint="One or two sentences shown in listings and when shared." required />
             <x-admin.markdown-editor label="Body" model="body" />
+
+            <section class="space-y-4 rounded-xl border border-muted/20 bg-white p-4" aria-labelledby="supporting-heading">
+                <div>
+                    <h2 id="supporting-heading" class="font-sans text-sm font-semibold uppercase tracking-wide">Supporting images</h2>
+                    <p class="mt-1 text-xs text-muted">Place the cursor in the body where the image should go, then upload and insert it. The caption is optional.</p>
+                </div>
+
+                @if ($bodyImage)
+                    <img src="{{ $bodyImage->temporaryUrl() }}" alt="Preview of the selected supporting image" class="max-h-48 rounded-lg">
+                @endif
+
+                <x-admin.input label="Image" name="bodyImage" type="file" wire:model="bodyImage" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB. Resized to 1600 px wide." />
+                <x-admin.input label="Alt text" name="bodyImageAlt" wire:model="bodyImageAlt" hint="Describe the image for people using screen readers." />
+                <x-admin.input label="Caption (optional)" name="bodyImageCaption" wire:model="bodyImageCaption" />
+
+                <button type="button" wire:click="insertBodyImage" wire:loading.attr="disabled" wire:target="insertBodyImage,bodyImage" class="btn btn-outline !py-2">Insert into article</button>
+            </section>
         </div>
 
         <aside class="space-y-6">

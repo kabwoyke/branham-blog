@@ -10,6 +10,7 @@ use App\Support\ImageStore;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -52,6 +53,12 @@ class Form extends Component
     public string $featured_image_alt = '';
 
     public bool $removeImage = false;
+
+    public ?TemporaryUploadedFile $bodyImage = null;
+
+    public string $bodyImageAlt = '';
+
+    public string $bodyImageCaption = '';
 
     public function mount(?Article $article = null): void
     {
@@ -98,6 +105,60 @@ class Form extends Component
 
             throw $exception;
         }
+    }
+
+    public function updatedBodyImage(): void
+    {
+        try {
+            $this->validateOnly('bodyImage', $this->bodyImageRules());
+        } catch (ValidationException $exception) {
+            $this->bodyImage = null;
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    private function bodyImageRules(): array
+    {
+        return [
+            'bodyImage' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'bodyImageAlt' => ['required', 'string', 'max:255'],
+            'bodyImageCaption' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    /**
+     * Store a supporting image and insert it into the editor as Markdown at the cursor.
+     */
+    public function insertBodyImage(): void
+    {
+        $this->article
+            ? Gate::authorize('update', $this->article)
+            : Gate::authorize('create', Article::class);
+
+        $this->validate($this->bodyImageRules(), [
+            'bodyImage.required' => 'Choose an image to upload.',
+            'bodyImageAlt.required' => 'Describe the image in the alt text field.',
+        ]);
+
+        $url = Storage::disk(ImageStore::DISK)->url(ImageStore::store($this->bodyImage, 'articles/body'));
+
+        $this->dispatch('markdown-insert', editor: 'body', markdown: $this->imageMarkdown($url));
+
+        $this->reset('bodyImage', 'bodyImageAlt', 'bodyImageCaption');
+    }
+
+    private function imageMarkdown(string $url): string
+    {
+        $alt = trim(str_replace(['[', ']', "\r", "\n"], ' ', $this->bodyImageAlt));
+        $caption = trim(str_replace(['"', "\r", "\n"], ["'", ' ', ' '], $this->bodyImageCaption));
+
+        $title = $caption !== '' ? " \"{$caption}\"" : '';
+
+        return "\n\n![{$alt}]({$url}{$title})\n\n";
     }
 
     public function updatedSlug(string $value): void

@@ -4,6 +4,7 @@
     <label for="{{ $name }}-editor" class="mb-1 block text-sm font-medium">{{ $label }}</label>
     <div
         wire:ignore
+        x-on:markdown-insert.window="if ($event.detail.editor === '{{ $model }}') { editor.codemirror.replaceSelection($event.detail.markdown); editor.codemirror.focus() }"
         x-data="{
             editor: null,
             init() {
