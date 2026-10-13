@@ -20,6 +20,8 @@ php artisan migrate:fresh --seed
 php artisan storage:link
 ```
 
+Before seeding, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`. The seeder creates the single admin user from these values and refuses to run without them. Sample articles come from `ArticleSeeder` (development data).
+
 On Windows PowerShell, create the SQLite file with `New-Item database/database.sqlite -ItemType File` and copy the env file with `Copy-Item .env.example .env`.
 
 ## Run locally
