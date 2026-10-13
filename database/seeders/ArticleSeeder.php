@@ -8,6 +8,7 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -41,14 +42,20 @@ class ArticleSeeder extends Seeder
         $categories = Category::query()->pluck('id', 'slug');
 
         foreach (self::ARTICLES as $index => $data) {
+            $slug = Str::slug($data['title']);
+            $hasImage = $index % 5 !== 4;
+            $inlineUrl = Storage::disk('public')->url(SampleImageGenerator::store("{$slug}-inline", 1000, 560));
+
             Article::updateOrCreate(
-                ['slug' => Str::slug($data['title'])],
+                ['slug' => $slug],
                 [
                     'user_id' => $author->id,
                     'category_id' => $categories[$data['category']],
                     'title' => $data['title'],
                     'excerpt' => $data['excerpt'],
-                    'body' => $this->body($data['title'], $data['excerpt']),
+                    'body' => $this->body($data['title'], $data['excerpt'], $inlineUrl),
+                    'featured_image' => $hasImage ? SampleImageGenerator::store($slug) : null,
+                    'featured_image_alt' => $hasImage ? 'Abstract artwork in green and ivory tones (sample image)' : null,
                     'type' => $data['type'],
                     'is_featured' => $data['featured'] ?? false,
                     'status' => ArticleStatus::Published,
@@ -82,7 +89,7 @@ class ArticleSeeder extends Seeder
         Article::firstOrCreate(['slug' => $slug], $attributes);
     }
 
-    private function body(string $title, string $excerpt): string
+    private function body(string $title, string $excerpt, string $inlineUrl): string
     {
         return <<<MD
         {$excerpt}
@@ -96,6 +103,8 @@ class ArticleSeeder extends Seeder
         ## What it could mean
 
         Patterns rarely announce themselves. They appear as small changes in behaviour, then in markets, then in policy. The value of anticipating them is not certainty, but preparedness.
+
+        ![Abstract artwork used as a sample supporting image]({$inlineUrl} "A sample supporting image with a caption")
 
         > The future is largely unpredictable, but there is real value in thinking it through.
 
