@@ -41,6 +41,12 @@ To run the scheduler locally (used for scheduled publishing in later phases):
 php artisan schedule:work
 ```
 
+## Admin area
+
+Sign in at `/admin/login` with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` from `.env`. There is no public registration. Articles are written in Markdown with a toolbar and live preview; raw HTML in article bodies is stripped when rendered. Featured images are resized to 1600 px wide and stored as WebP on the `public` disk (run `php artisan storage:link`).
+
+Scheduled articles are published by `php artisan articles:publish-scheduled`, which the scheduler runs every minute. Locally use `php artisan schedule:work`; in production add a cron entry that runs `php artisan schedule:run` every minute.
+
 ## Test and format
 
 ```bash

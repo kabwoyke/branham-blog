@@ -4,13 +4,17 @@ namespace App\Models;
 
 use App\Enums\ArticleStatus;
 use App\Enums\ArticleType;
+use App\Support\ImageStore;
+use App\Support\Markdown;
 use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'user_id', 'category_id', 'title', 'slug', 'excerpt', 'body', 'type', 'featured_image',
@@ -44,6 +48,24 @@ class Article extends Model
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
         ];
+    }
+
+    /**
+     * The body rendered from Markdown to safe HTML.
+     */
+    protected function bodyHtml(): Attribute
+    {
+        return Attribute::get(fn (): string => Markdown::toHtml($this->body));
+    }
+
+    /**
+     * Public URL of the featured image, if one is set.
+     */
+    protected function featuredImageUrl(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?string => $this->featured_image ? Storage::disk(ImageStore::DISK)->url($this->featured_image) : null
+        );
     }
 
     public function getRouteKeyName(): string

@@ -17,13 +17,12 @@ class AdminUserSeeder extends Seeder
             throw new RuntimeException('Set ADMIN_EMAIL and ADMIN_PASSWORD in .env before seeding the admin user.');
         }
 
-        User::updateOrCreate(
-            ['email' => $email],
-            [
-                'name' => config('blog.admin.name'),
-                'password' => $password,
-                'email_verified_at' => now(),
-            ],
-        );
+        $admin = User::firstOrNew(['email' => $email]);
+        $admin->forceFill([
+            'name' => config('blog.admin.name'),
+            'password' => $password,
+            'email_verified_at' => now(),
+            'is_admin' => true,
+        ])->save();
     }
 }
