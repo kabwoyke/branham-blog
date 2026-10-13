@@ -1,9 +1,63 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
+    --color-brand: #2f5d50;
+    --color-ink: #24282d;
+    --color-paper: #faf7f2;
+    --color-muted: #66716d;
+
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'Source Serif 4', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-paper font-sans text-ink antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-serif;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+        @apply outline-2 outline-offset-2 outline-brand;
+    }
+}
+
+@utility prose-article {
+    @apply prose max-w-[68ch] font-serif text-lg;
+    --tw-prose-body: var(--color-ink);
+    --tw-prose-headings: var(--color-ink);
+    --tw-prose-lead: var(--color-muted);
+    --tw-prose-links: var(--color-brand);
+    --tw-prose-bold: var(--color-ink);
+    --tw-prose-counters: var(--color-muted);
+    --tw-prose-bullets: var(--color-muted);
+    --tw-prose-hr: color-mix(in srgb, var(--color-muted) 30%, transparent);
+    --tw-prose-quotes: var(--color-ink);
+    --tw-prose-quote-borders: var(--color-brand);
+    --tw-prose-captions: var(--color-muted);
+    --tw-prose-code: var(--color-ink);
+    --tw-prose-th-borders: var(--color-muted);
+    --tw-prose-td-borders: color-mix(in srgb, var(--color-muted) 30%, transparent);
 }

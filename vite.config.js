@@ -12,6 +12,10 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
+                bunny('Source Serif 4', {
+                    weights: [400, 600, 700],
+                    styles: ['normal', 'italic'],
+                }),
             ],
         }),
         tailwindcss(),
