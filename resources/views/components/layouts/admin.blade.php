@@ -27,7 +27,7 @@
 
         <header class="border-b border-muted/20 bg-white">
             <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
-                <a href="{{ route('admin.dashboard') }}" class="font-serif text-xl font-semibold">{{ config('app.name') }} <span class="font-sans text-xs font-medium uppercase tracking-wide text-muted">Admin</span></a>
+                <a href="{{ route('admin.dashboard') }}" class="text-xl font-semibold">{{ config('app.name') }} <span class="font-sans text-xs font-medium uppercase tracking-wide text-muted">Admin</span></a>
 
                 @auth
                     <nav aria-label="Admin" class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">

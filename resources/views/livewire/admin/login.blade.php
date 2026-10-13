@@ -11,6 +11,6 @@
             Remember me
         </label>
 
-        <button type="submit" class="w-full bg-brand px-5 py-3 text-sm font-medium text-white hover:bg-brand/90" wire:loading.attr="disabled">Sign in</button>
+        <button type="submit" class="w-full rounded-lg bg-brand px-5 py-3 text-sm font-medium text-white hover:bg-brand/90" wire:loading.attr="disabled">Sign in</button>
     </form>
 </div>

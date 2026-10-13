@@ -31,7 +31,7 @@
                     Featured article
                 </label>
 
-                <button type="submit" class="w-full bg-brand px-4 py-3 text-sm font-medium text-white hover:bg-brand/90" wire:loading.attr="disabled" wire:target="save,image">
+                <button type="submit" class="w-full rounded-lg bg-brand px-4 py-3 text-sm font-medium text-white hover:bg-brand/90" wire:loading.attr="disabled" wire:target="save,image">
                     {{ $status === 'published' ? 'Save and publish' : ($status === 'scheduled' ? 'Schedule' : 'Save draft') }}
                 </button>
             </section>

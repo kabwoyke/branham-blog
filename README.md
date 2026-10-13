@@ -71,4 +71,4 @@ Defined in `resources/css/app.css` under `@theme`:
 | `paper` | `#FAF7F2` | Page background |
 | `muted` | `#66716D` | Dates, captions, secondary text |
 
-Fonts: Source Serif 4 (headings and article body) and Instrument Sans (UI), loaded through the Vite `@fonts` directive.
+Font: Plus Jakarta Sans for everything (headings, body and UI), loaded through the Vite `@fonts` directive. Buttons use the `btn`, `btn-primary` and `btn-outline` utilities (rounded corners) defined in `resources/css/app.css`.

@@ -1,7 +1,7 @@
 <div>
     <div class="flex items-center justify-between">
         <h1 class="text-3xl font-semibold">Articles</h1>
-        <a href="{{ route('admin.articles.create') }}" class="bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90">New article</a>
+        <a href="{{ route('admin.articles.create') }}" class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90">New article</a>
     </div>
 
     <div class="mt-6 grid gap-4 md:grid-cols-4">

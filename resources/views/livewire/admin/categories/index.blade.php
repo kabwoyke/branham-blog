@@ -10,7 +10,7 @@
                         <x-admin.input label="Name" name="name" wire:model="name" required />
                         <x-admin.textarea label="Description" name="description" wire:model="description" rows="2" />
                         <div class="flex gap-3 text-sm">
-                            <button type="submit" class="bg-brand px-4 py-2 font-medium text-white hover:bg-brand/90">Save</button>
+                            <button type="submit" class="rounded-lg bg-brand px-4 py-2 font-medium text-white hover:bg-brand/90">Save</button>
                             <button type="button" wire:click="cancel" class="text-muted hover:text-brand">Cancel</button>
                         </div>
                     </form>

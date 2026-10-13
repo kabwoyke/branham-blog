@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class BaseLayoutTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_layout_renders_wordmark_and_navigation(): void
     {
         $this->get(route('home'))

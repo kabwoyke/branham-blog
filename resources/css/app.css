@@ -11,9 +11,8 @@
     --color-paper: #faf7f2;
     --color-muted: #66716d;
 
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-serif: 'Source Serif 4', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 }
 
 @layer base {
@@ -29,7 +28,7 @@
     h2,
     h3,
     h4 {
-        @apply font-serif;
+        @apply tracking-tight;
     }
 
     [x-cloak] {
@@ -45,8 +44,20 @@
     }
 }
 
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-colors;
+}
+
+@utility btn-primary {
+    @apply bg-brand text-white hover:bg-brand/90;
+}
+
+@utility btn-outline {
+    @apply border border-brand text-brand hover:bg-brand/10;
+}
+
 @utility prose-article {
-    @apply prose max-w-[68ch] font-serif text-lg;
+    @apply prose max-w-[68ch] text-lg leading-relaxed;
     --tw-prose-body: var(--color-ink);
     --tw-prose-headings: var(--color-ink);
     --tw-prose-lead: var(--color-muted);

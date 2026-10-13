@@ -14,6 +14,6 @@
 
         <x-admin.markdown-editor label="About page content" model="about_content" />
 
-        <button type="submit" class="bg-brand px-5 py-3 text-sm font-medium text-white hover:bg-brand/90">Save settings</button>
+        <button type="submit" class="rounded-lg bg-brand px-5 py-3 text-sm font-medium text-white hover:bg-brand/90">Save settings</button>
     </form>
 </div>

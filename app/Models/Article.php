@@ -10,6 +10,7 @@ use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -97,6 +98,36 @@ class Article extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Whether guests can currently see this article.
+     */
+    public function isPublic(): bool
+    {
+        return $this->status === ArticleStatus::Published
+            && $this->published_at !== null
+            && $this->published_at->lte(now());
+    }
+
+    /**
+     * Published articles from the same category first, then the most recent others.
+     *
+     * @return Collection<int, Article>
+     */
+    public function related(int $limit = 3): Collection
+    {
+        $base = fn () => static::published()->with(['category', 'author'])->whereKeyNot($this->getKey())->latest('published_at');
+
+        $related = $base()->where('category_id', $this->category_id)->limit($limit)->get();
+
+        if ($related->count() < $limit) {
+            $related = $related->concat(
+                $base()->where('category_id', '!=', $this->category_id)->limit($limit - $related->count())->get()
+            );
+        }
+
+        return $related;
     }
 
     /**

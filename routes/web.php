@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\Admin\LogoutController;
 use App\Http\Controllers\Admin\SubscriberExportController;
+use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PageController;
 use App\Livewire\Admin\Articles\Form as ArticleForm;
 use App\Livewire\Admin\Articles\Index as ArticleIndex;
 use App\Livewire\Admin\Categories\Index as CategoryIndex;
@@ -12,9 +16,11 @@ use App\Livewire\Admin\Settings;
 use App\Livewire\Admin\Subscribers\Index as SubscriberIndex;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home')->name('home');
-Route::view('/articles', 'placeholder', ['title' => 'Articles'])->name('articles.index');
-Route::view('/about', 'placeholder', ['title' => 'About'])->name('about');
+Route::get('/', HomeController::class)->name('home');
+Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');
+Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::view('/contact', 'placeholder', ['title' => 'Contact'])->name('contact');
 
 Route::prefix('admin')->name('admin.')->group(function () {

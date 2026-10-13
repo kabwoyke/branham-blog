@@ -1,14 +1,14 @@
 <div>
     <div class="flex items-center justify-between">
         <h1 class="text-3xl font-semibold">Dashboard</h1>
-        <a href="{{ route('admin.articles.create') }}" class="bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90">New article</a>
+        <a href="{{ route('admin.articles.create') }}" class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90">New article</a>
     </div>
 
     <dl class="mt-8 grid grid-cols-2 gap-4 md:grid-cols-5">
         @foreach ([['Published', $publishedCount], ['Drafts', $draftCount], ['Scheduled', $scheduledCount], ['Subscribers', $subscriberCount], ['Unread messages', $unreadCount]] as [$label, $count])
             <div class="border border-muted/20 bg-white p-4">
                 <dt class="text-xs uppercase tracking-wide text-muted">{{ $label }}</dt>
-                <dd class="mt-1 font-serif text-3xl">{{ $count }}</dd>
+                <dd class="mt-1 text-3xl">{{ $count }}</dd>
             </div>
         @endforeach
     </dl>
