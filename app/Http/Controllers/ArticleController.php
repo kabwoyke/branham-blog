@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use App\Models\Category;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 
@@ -11,15 +10,14 @@ class ArticleController extends Controller
 {
     public const PER_PAGE = 9;
 
-    public function index(): View
+    public function featured(): View
     {
-        return view('articles.index', [
+        return view('articles.featured', [
             'articles' => Article::published()
+                ->featured()
                 ->with(['category', 'author'])
                 ->latest('published_at')
                 ->paginate(self::PER_PAGE),
-            'categories' => Category::orderBy('id')->get(),
-            'category' => null,
         ]);
     }
 

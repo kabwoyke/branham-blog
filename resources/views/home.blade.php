@@ -11,7 +11,10 @@
 
     @if ($featured->isNotEmpty())
         <section class="mx-auto mt-16 max-w-6xl px-4 sm:px-6" aria-labelledby="featured-heading">
-            <h2 id="featured-heading" class="text-2xl font-bold">Featured</h2>
+            <div class="flex items-end justify-between">
+                <h2 id="featured-heading" class="text-2xl font-bold">Featured</h2>
+                <a href="{{ route('articles.featured') }}" class="text-sm font-semibold text-brand hover:underline">All featured &rarr;</a>
+            </div>
             <div class="mt-6 grid gap-10 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($featured as $article)
                     <x-article-card :article="$article" :large="$featured->count() < 3" />
