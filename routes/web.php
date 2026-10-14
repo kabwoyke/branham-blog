@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\LogoutController;
 use App\Http\Controllers\Admin\SubscriberExportController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SeoController;
 use App\Livewire\Admin\Articles\Form as ArticleForm;
 use App\Livewire\Admin\Articles\Index as ArticleIndex;
 use App\Livewire\Admin\Categories\Index as CategoryIndex;
@@ -22,6 +24,9 @@ Route::get('/articles', Browse::class)->name('articles.index');
 Route::get('/featured', [ArticleController::class, 'featured'])->name('articles.featured');
 Route::get('/articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/category/{category:slug}', Browse::class)->name('categories.show');
+Route::get('/feed', FeedController::class)->name('feed');
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 

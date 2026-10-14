@@ -1,8 +1,5 @@
 <div>
-    <section class="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
-        <h1 class="text-4xl font-extrabold sm:text-5xl">{{ $heading }}</h1>
-        <p class="mt-3 max-w-2xl text-lg text-muted">{{ $intro }}</p>
-
+    <x-page-header :eyebrow="$category ? 'Topic' : null" :title="$heading" :intro="$intro">
         <form role="search" id="search" wire:submit.prevent class="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
             <div>
                 <label for="article-search" class="sr-only">Search articles</label>
@@ -29,17 +26,17 @@
 
         <nav aria-label="Categories" class="mt-6 flex flex-wrap gap-2 text-sm font-semibold">
             @php($carry = array_filter(['q' => trim($search) ?: null, 'type' => $type ?: null]))
-            <a href="{{ route('articles.index', $carry) }}" wire:navigate @if (! $category) aria-current="page" @endif @class(['rounded-full border px-4 py-2', 'border-brand bg-brand text-white' => ! $category, 'border-muted/30 hover:border-brand hover:text-brand' => $category])>All</a>
+            <a href="{{ route('articles.index', $carry) }}" wire:navigate @if (! $category) aria-current="page" @endif @class(['rounded-full border px-4 py-2', 'border-brand bg-brand text-white' => ! $category, 'border-muted/30 bg-white hover:border-brand hover:text-brand' => $category])>All</a>
             @foreach ($categories as $item)
                 @php($isCurrent = $category?->is($item))
-                <a href="{{ route('categories.show', ['category' => $item->slug] + $carry) }}" wire:navigate @if ($isCurrent) aria-current="page" @endif @class(['rounded-full border px-4 py-2', 'border-brand bg-brand text-white' => $isCurrent, 'border-muted/30 hover:border-brand hover:text-brand' => ! $isCurrent])>{{ $item->name }}</a>
+                <a href="{{ route('categories.show', ['category' => $item->slug] + $carry) }}" wire:navigate @if ($isCurrent) aria-current="page" @endif @class(['rounded-full border px-4 py-2', 'border-brand bg-brand text-white' => $isCurrent, 'border-muted/30 bg-white hover:border-brand hover:text-brand' => ! $isCurrent])>{{ $item->name }}</a>
             @endforeach
         </nav>
-    </section>
+    </x-page-header>
 
     @php($summary = $articles->total().' '.Str::plural('article', $articles->total()).(trim($search) !== '' ? ' matching “'.trim($search).'”' : ''))
 
-    <section id="results"class="mx-auto mt-10 max-w-6xl scroll-mt-6 px-4 sm:px-6" aria-label="Article list">
+    <section id="results" class="mx-auto mt-10 max-w-6xl scroll-mt-6 px-4 sm:px-6" aria-label="Article list">
         <p class="mb-6 text-sm text-muted" role="status" aria-live="polite">
             {{ $summary }}
             <span wire:loading class="ml-2">Updating…</span>
@@ -60,7 +57,7 @@
                 @endif
             </div>
         @else
-            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($articles as $article)
                     <x-article-card :article="$article" wire:key="article-{{ $article->id }}" />
                 @endforeach

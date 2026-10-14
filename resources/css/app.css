@@ -35,6 +35,12 @@
         display: none !important;
     }
 
+    input:not([type='checkbox'], [type='radio']),
+    textarea,
+    select {
+        @apply transition-colors focus:border-brand;
+    }
+
     a:focus-visible,
     button:focus-visible,
     input:focus-visible,
@@ -49,7 +55,15 @@
 }
 
 @utility btn-primary {
-    @apply bg-brand text-white hover:bg-brand/90;
+    @apply bg-brand text-white shadow-sm hover:bg-brand/90;
+}
+
+@utility eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-brand;
+}
+
+@utility section-title {
+    @apply text-2xl font-bold tracking-tight sm:text-3xl;
 }
 
 @utility btn-outline {

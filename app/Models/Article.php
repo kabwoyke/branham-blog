@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
@@ -31,6 +32,11 @@ class Article extends Model
 
     protected static function booted(): void
     {
+        $forgetSitemap = fn () => Cache::forget('sitemap-xml');
+        static::saved($forgetSitemap);
+        static::deleted($forgetSitemap);
+        static::restored($forgetSitemap);
+
         static::saving(function (Article $article): void {
             if ($article->isDirty('body')) {
                 $article->reading_time = self::calculateReadingTime($article->body);

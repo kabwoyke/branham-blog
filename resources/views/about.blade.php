@@ -1,9 +1,8 @@
 <x-layouts.app title="About" :description="$tagline">
-    <section class="mx-auto max-w-3xl px-4 pt-14 sm:px-6">
-        <p class="text-sm font-semibold uppercase tracking-widest text-brand">{{ $tagline }}</p>
-        <h1 class="mt-3 text-4xl font-extrabold sm:text-5xl">About</h1>
+    <x-page-header :eyebrow="$tagline" title="About" />
 
-        <div class="prose-article mt-8">
+    <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6">
+        <div class="prose-article">
             {!! $content !!}
         </div>
 
