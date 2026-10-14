@@ -62,6 +62,13 @@
             <button type="button" x-on:click="copy" class="btn btn-outline !px-4 !py-2">Copy link</button>
             <span class="text-sm font-semibold text-brand" role="status" aria-live="polite" x-cloak x-show="copied">Copied</span>
         </div>
+
+        <aside class="mt-10 rounded-xl bg-brand/10 p-6" aria-labelledby="article-newsletter-heading">
+            <h2 id="article-newsletter-heading" class="text-lg font-bold">Enjoyed this? Get new articles by email.</h2>
+            <div class="mt-4">
+                <livewire:newsletter.signup location="article" />
+            </div>
+        </aside>
     </article>
 
     @if ($related->isNotEmpty())

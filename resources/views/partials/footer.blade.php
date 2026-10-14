@@ -4,6 +4,12 @@
 @endphp
 
 <footer class="mt-20 border-t border-muted/20">
+    <div class="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
+        <p class="text-sm font-semibold text-ink">Get new articles by email</p>
+        <div class="mt-3 max-w-md">
+            <livewire:newsletter.signup location="footer" />
+        </div>
+    </div>
     <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
             <p class="font-bold text-ink">{{ config('app.name') }}</p>

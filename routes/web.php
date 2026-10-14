@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\LogoutController;
 use App\Http\Controllers\Admin\SubscriberExportController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
 use App\Livewire\Admin\Articles\Form as ArticleForm;
 use App\Livewire\Admin\Articles\Index as ArticleIndex;
@@ -22,7 +23,13 @@ Route::get('/featured', [ArticleController::class, 'featured'])->name('articles.
 Route::get('/articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/category/{category:slug}', Browse::class)->name('categories.show');
 Route::get('/about', [PageController::class, 'about'])->name('about');
-Route::view('/contact', 'placeholder', ['title' => 'Contact'])->name('contact');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+
+Route::prefix('newsletter')->name('newsletter.')->group(function () {
+    Route::get('confirm/{subscriber}', [NewsletterController::class, 'confirm'])->middleware('signed')->name('confirm');
+    Route::get('unsubscribe/{token}', [NewsletterController::class, 'showUnsubscribe'])->name('unsubscribe');
+    Route::post('unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('unsubscribe.destroy');
+});
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', Login::class)->middleware('guest')->name('login');

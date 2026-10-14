@@ -54,4 +54,14 @@
             @endforeach
         </ul>
     </section>
+
+    <section class="mx-auto mt-16 max-w-6xl px-4 sm:px-6" aria-labelledby="newsletter-heading">
+        <div class="rounded-xl bg-brand/10 p-8 sm:p-10">
+            <h2 id="newsletter-heading" class="text-2xl font-bold">Get new articles by email</h2>
+            <p class="mt-2 max-w-xl text-muted">Occasional observations on society, business and the future. Unsubscribe at any time.</p>
+            <div class="mt-6 max-w-xl">
+                <livewire:newsletter.signup location="home" />
+            </div>
+        </div>
+    </section>
 </x-layouts.app>
