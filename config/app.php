@@ -55,6 +55,12 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     /*
+    | Web root override for hosts where the document root (public_html) is not the app's public folder.
+    */
+
+    'public_path' => env('PUBLIC_PATH'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------

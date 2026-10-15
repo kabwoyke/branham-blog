@@ -103,3 +103,50 @@ Target: a standard shared or VPS PHP host (PHP 8.3+, Nginx or Apache). No contai
 11. **Before launch:** confirm the phone country code (the contact page needs it for the WhatsApp link), set the LinkedIn URL and About text in the admin settings, and replace the wordmark if a logo is supplied.
 
 Security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, and HSTS over HTTPS) are added by `App\Http\Middleware\SecurityHeaders`. Article Markdown is rendered with raw HTML stripped and unsafe links blocked; admin sign-in, contact and newsletter forms are rate limited.
+
+## Deploying to Hostinger (shared hosting)
+
+Hostinger serves your domain from `public_html`, so the app is kept in a private sibling folder and only the contents of `public/` go into `public_html`. Layout on the server:
+
+```
+domains/your-domain.com/
+  branham-blog/   <- the whole project (private)
+  public_html/    <- contents of public/ only
+```
+
+**1. Prepare locally** (shared hosting has no Node, so assets are built here):
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+```
+
+Zip the project **excluding** `node_modules`, `.git`, `.env`, `tests` and `database/database.sqlite`. Keep `vendor/` and `public/build/` in the zip.
+
+**2. Create in hPanel:** a MySQL database and user (Databases), a mailbox for outgoing mail (Emails), and enable the free SSL certificate (Security > SSL). Use PHP 8.3 or newer (Advanced > PHP Configuration) with the `mbstring`, `openssl`, `fileinfo`, `gd`, `pdo_mysql` and `xml` extensions enabled.
+
+**3. Upload** with File Manager or FTP: extract the zip into `domains/your-domain.com/branham-blog/`, then move everything inside `branham-blog/public/` (including `.htaccess` and `build/`) into `public_html/`. `public/index.php` finds the sibling `branham-blog` folder on its own.
+
+**4. Configure:** copy `.env.hostinger.example` to `branham-blog/.env` and fill it in. `PUBLIC_PATH` must be the absolute path of `public_html` (shown in File Manager); it tells Laravel where the built assets and the `storage` link live. Make `storage/` and `bootstrap/cache/` writable (755 or 775).
+
+**5. Initialise.** With SSH (Premium and Business plans), from `branham-blog/`:
+
+```bash
+php artisan key:generate --force
+php artisan migrate --force
+php artisan db:seed --force
+php artisan storage:link
+php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan event:cache
+```
+
+Without SSH, generate the key locally (`php artisan key:generate --show`) and paste it into `APP_KEY`. Then either import a seeded local MySQL dump through phpMyAdmin, or temporarily add one-off cron jobs (hPanel > Advanced > Cron Jobs) running `cd /home/uXXX/domains/your-domain.com/branham-blog && php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan config:cache`. Remove the one-off job after it has run.
+
+**6. Scheduler** (publishes scheduled articles): in hPanel > Advanced > Cron Jobs add one job running every minute:
+
+```
+cd /home/uXXX/domains/your-domain.com/branham-blog && php artisan schedule:run >> /dev/null 2>&1
+```
+
+**7. Check:** open the site, sign in at `/admin/login`, upload a featured image, send a test contact message and subscribe to the newsletter to confirm mail works. Then remove `ADMIN_PASSWORD` from `.env`.
+
+Updating later: upload changed files, then run `php artisan migrate --force` and the cache commands again (`php artisan optimize:clear` first if something looks stale). Back up the database from hPanel > Backups or phpMyAdmin, and download `storage/app/public` for uploaded images.

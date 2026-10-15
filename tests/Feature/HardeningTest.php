@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Article;
+use App\Providers\AppServiceProvider;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -60,5 +61,17 @@ class HardeningTest extends TestCase
         (new DatabaseSeeder)->setContainer($this->app)->run();
 
         $this->assertSame(0, Article::count());
+    }
+
+    public function test_public_path_can_be_overridden_for_shared_hosting(): void
+    {
+        $original = public_path();
+
+        config(['app.public_path' => '/srv/public_html']);
+        (new AppServiceProvider($this->app))->register();
+
+        $this->assertSame('/srv/public_html', public_path());
+
+        $this->app->usePublicPath($original);
     }
 }
