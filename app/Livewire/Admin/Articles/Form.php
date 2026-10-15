@@ -60,6 +60,8 @@ class Form extends Component
 
     public string $bodyImageCaption = '';
 
+    public int $imageInputVersion = 0;
+
     public function mount(?Article $article = null): void
     {
         if ($article?->exists) {
@@ -105,6 +107,26 @@ class Form extends Component
 
             throw $exception;
         }
+    }
+
+    /**
+     * Discard the featured image that was chosen but not yet saved.
+     */
+    public function clearImage(): void
+    {
+        $this->reset('image');
+        $this->resetErrorBag('image');
+        $this->imageInputVersion++;
+    }
+
+    /**
+     * Discard the supporting image that was chosen but not yet inserted.
+     */
+    public function clearBodyImage(): void
+    {
+        $this->reset('bodyImage', 'bodyImageAlt', 'bodyImageCaption');
+        $this->resetErrorBag(['bodyImage', 'bodyImageAlt', 'bodyImageCaption']);
+        $this->imageInputVersion++;
     }
 
     public function updatedBodyImage(): void

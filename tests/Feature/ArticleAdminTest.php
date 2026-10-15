@@ -142,6 +142,27 @@ class ArticleAdminTest extends TestCase
         $this->assertLessThanOrEqual(1600, getimagesizefromstring(Storage::disk('public')->get($article->featured_image))[0]);
     }
 
+    public function test_selected_images_can_be_removed_before_saving(): void
+    {
+        Storage::fake('public');
+
+        $this->fillForm()
+            ->set('image', UploadedFile::fake()->image('cover.jpg', 800, 400))
+            ->call('clearImage')
+            ->assertSet('image', null)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertNull(Article::firstOrFail()->featured_image);
+
+        $this->fillForm()
+            ->set('bodyImage', UploadedFile::fake()->image('inline.jpg', 800, 400))
+            ->set('bodyImageAlt', 'Alt')
+            ->call('clearBodyImage')
+            ->assertSet('bodyImage', null)
+            ->assertSet('bodyImageAlt', '');
+    }
+
     public function test_non_image_uploads_are_rejected(): void
     {
         Storage::fake('public');

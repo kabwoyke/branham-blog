@@ -1,12 +1,12 @@
 <div>
-    <h1 class="text-3xl font-semibold">Messages</h1>
+    <h1 class="text-3xl font-bold">Messages</h1>
 
     <label class="mt-4 flex items-center gap-2 text-sm">
         <input type="checkbox" wire:model.live="unreadOnly" class="size-4 accent-brand">
         Unread only
     </label>
 
-    <ul class="mt-6 divide-y divide-muted/20 border border-muted/20 bg-white">
+    <ul class="mt-6 divide-y divide-muted/20 card">
         @forelse ($messages as $message)
             <li class="px-4 py-3" wire:key="message-{{ $message->id }}">
                 <div class="flex items-start justify-between gap-4">

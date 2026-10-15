@@ -9,7 +9,7 @@
         </div>
 
         <aside aria-label="Other ways to reach Branham">
-            <ul class="space-y-5 rounded-2xl border border-muted/20 bg-white p-6 text-sm">
+            <ul class="space-y-5 card p-6 text-sm">
                 @if ($email)
                     <li><span class="block font-semibold">Email</span><a href="mailto:{{ $email }}" class="text-brand hover:underline">{{ $email }}</a></li>
                 @endif

@@ -87,3 +87,11 @@
     --tw-prose-th-borders: var(--color-muted);
     --tw-prose-td-borders: color-mix(in srgb, var(--color-muted) 30%, transparent);
 }
+
+@utility card {
+    @apply rounded-xl border border-muted/15 bg-white shadow-sm;
+}
+
+@utility field {
+    @apply block w-full rounded-lg border border-muted/40 bg-white px-3 py-2 text-sm shadow-sm;
+}

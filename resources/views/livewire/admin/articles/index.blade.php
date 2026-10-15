@@ -1,7 +1,7 @@
 <div>
     <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-semibold">Articles</h1>
-        <a href="{{ route('admin.articles.create') }}" class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90">New article</a>
+        <h1 class="text-3xl font-bold">Articles</h1>
+        <a href="{{ route('admin.articles.create') }}" class="rounded-lg bg-brand px-4 py-2 shadow-sm text-sm font-medium text-white hover:bg-brand/90">New article</a>
     </div>
 
     <div class="mt-6 grid gap-4 md:grid-cols-4">
@@ -24,7 +24,7 @@
         </label>
     </div>
 
-    <div class="mt-6 overflow-x-auto border border-muted/20 bg-white">
+    <div class="mt-6 overflow-x-auto card">
         <table class="w-full text-left text-sm">
             <thead class="border-b border-muted/20 text-xs uppercase tracking-wide text-muted">
                 <tr>

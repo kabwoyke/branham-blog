@@ -1,5 +1,8 @@
 import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
+import { htmlToMarkdown, isSafeUrl, sanitizeHtml } from './rich-text';
+
+window.richText = { htmlToMarkdown, isSafeUrl, sanitizeHtml };
 
 // Text-labelled toolbar so no icon font is downloaded from a CDN.
 window.makeMarkdownEditor = (element, initialValue, onChange) => {

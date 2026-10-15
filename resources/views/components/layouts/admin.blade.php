@@ -25,19 +25,25 @@
     <body class="min-h-screen">
         <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-brand focus:px-4 focus:py-2 focus:text-white">Skip to content</a>
 
-        <header class="border-b border-muted/20 bg-white">
-            <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
-                <a href="{{ route('admin.dashboard') }}" class="text-xl font-semibold">{{ config('app.name') }} <span class="font-sans text-xs font-medium uppercase tracking-wide text-muted">Admin</span></a>
+        <header class="sticky top-0 z-40 border-b border-muted/15 bg-white/90 backdrop-blur">
+            <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 text-lg font-extrabold tracking-tight">
+                    <span class="inline-block size-2.5 rounded-full bg-brand" aria-hidden="true"></span>
+                    {{ config('app.name') }}
+                    <span class="rounded-full bg-brand/10 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-brand">Admin</span>
+                </a>
 
                 @auth
-                    <nav aria-label="Admin" class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
+                    <nav aria-label="Admin" class="flex flex-wrap items-center gap-1 text-sm font-semibold">
                         @foreach ($links as $link)
-                            <a href="{{ route($link['route']) }}" @class(['hover:text-brand', 'text-brand underline underline-offset-4' => request()->routeIs($link['route'], str_replace('.index', '.*', $link['route']))])>{{ $link['label'] }}</a>
+                            @php($active = request()->routeIs($link['route'], str_replace('.index', '.*', $link['route'])))
+                            <a href="{{ route($link['route']) }}" @if ($active) aria-current="page" @endif @class(['rounded-full px-3 py-1.5 transition-colors', 'bg-brand/10 text-brand' => $active, 'hover:bg-brand/5 hover:text-brand' => ! $active])>{{ $link['label'] }}</a>
                         @endforeach
-                        <a href="{{ route('home') }}" class="text-muted hover:text-brand" target="_blank" rel="noopener">View site</a>
+                        <span class="mx-2 hidden h-5 w-px bg-muted/30 sm:block" aria-hidden="true"></span>
+                        <a href="{{ route('home') }}" class="rounded-full px-3 py-1.5 text-muted hover:text-brand" target="_blank" rel="noopener">View site</a>
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
-                            <button type="submit" class="text-muted hover:text-brand">Sign out</button>
+                            <button type="submit" class="rounded-full px-3 py-1.5 text-muted hover:text-brand">Sign out</button>
                         </form>
                     </nav>
                 @endauth
@@ -46,7 +52,7 @@
 
         <x-flash />
 
-        <main id="main" class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <main id="main" class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
             {{ $slot }}
         </main>
 

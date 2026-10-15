@@ -1,6 +1,6 @@
 <div>
     <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-semibold">Subscribers</h1>
+        <h1 class="text-3xl font-bold">Subscribers</h1>
         <a href="{{ route('admin.subscribers.export') }}" class="rounded-lg border border-brand px-4 py-2 text-sm font-medium text-brand hover:bg-brand/10">Export CSV</a>
     </div>
     <p class="mt-2 text-sm text-muted">{{ $confirmedCount }} confirmed.</p>
@@ -9,7 +9,7 @@
         <x-admin.input label="Search email" name="search" type="search" wire:model.live.debounce.300ms="search" />
     </div>
 
-    <div class="mt-6 overflow-x-auto border border-muted/20 bg-white">
+    <div class="mt-6 overflow-x-auto card">
         <table class="w-full text-left text-sm">
             <thead class="border-b border-muted/20 text-xs uppercase tracking-wide text-muted">
                 <tr>

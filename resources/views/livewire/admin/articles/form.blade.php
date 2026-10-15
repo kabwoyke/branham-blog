@@ -1,6 +1,6 @@
 <div>
     <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-semibold">{{ $article ? 'Edit article' : 'New article' }}</h1>
+        <h1 class="text-3xl font-bold">{{ $article ? 'Edit article' : 'New article' }}</h1>
         <a href="{{ route('admin.articles.index') }}" class="text-sm text-muted hover:text-brand">&larr; All articles</a>
     </div>
 
@@ -11,7 +11,7 @@
             <x-admin.textarea label="Excerpt" name="excerpt" wire:model="excerpt" rows="3" hint="One or two sentences shown in listings and when shared." required />
             <x-admin.markdown-editor label="Body" model="body" />
 
-            <section class="space-y-4 rounded-xl border border-muted/20 bg-white p-4" aria-labelledby="supporting-heading">
+            <section class="space-y-4 card p-4" aria-labelledby="supporting-heading">
                 <div>
                     <h2 id="supporting-heading" class="font-sans text-sm font-semibold uppercase tracking-wide">Supporting images</h2>
                     <p class="mt-1 text-xs text-muted">Place the cursor in the body where the image should go, then upload and insert it. The caption is optional.</p>
@@ -19,9 +19,10 @@
 
                 @if ($bodyImage)
                     <img src="{{ $bodyImage->temporaryUrl() }}" alt="Preview of the selected supporting image" class="max-h-48 rounded-lg">
+                    <button type="button" wire:click="clearBodyImage" class="text-sm text-red-700 hover:underline">Remove selected image</button>
                 @endif
 
-                <x-admin.input label="Image" name="bodyImage" type="file" wire:model="bodyImage" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB. Resized to 1600 px wide." />
+                <x-admin.input label="Image" name="bodyImage" type="file" wire:key="body-image-{{ $imageInputVersion }}" wire:model="bodyImage" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB. Resized to 1600 px wide." />
                 <x-admin.input label="Alt text" name="bodyImageAlt" wire:model="bodyImageAlt" hint="Describe the image for people using screen readers." />
                 <x-admin.input label="Caption (optional)" name="bodyImageCaption" wire:model="bodyImageCaption" />
 
@@ -30,7 +31,7 @@
         </div>
 
         <aside class="space-y-6">
-            <section class="space-y-4 border border-muted/20 bg-white p-4" aria-labelledby="publish-heading">
+            <section class="space-y-4 card p-4" aria-labelledby="publish-heading">
                 <h2 id="publish-heading" class="font-sans text-sm font-semibold uppercase tracking-wide">Publish</h2>
 
                 <x-admin.select label="Status" name="status" wire:model.live="status">
@@ -48,12 +49,12 @@
                     Featured article
                 </label>
 
-                <button type="submit" class="w-full rounded-lg bg-brand px-4 py-3 text-sm font-medium text-white hover:bg-brand/90" wire:loading.attr="disabled" wire:target="save,image">
+                <button type="submit" class="w-full rounded-lg bg-brand px-4 py-3 shadow-sm text-sm font-medium text-white hover:bg-brand/90" wire:loading.attr="disabled" wire:target="save,image">
                     {{ $status === 'published' ? 'Save and publish' : ($status === 'scheduled' ? 'Schedule' : 'Save draft') }}
                 </button>
             </section>
 
-            <section class="space-y-4 border border-muted/20 bg-white p-4" aria-labelledby="details-heading">
+            <section class="space-y-4 card p-4" aria-labelledby="details-heading">
                 <h2 id="details-heading" class="font-sans text-sm font-semibold uppercase tracking-wide">Details</h2>
 
                 <x-admin.select label="Category" name="category_id" wire:model="category_id">
@@ -69,24 +70,27 @@
                 </x-admin.select>
             </section>
 
-            <section class="space-y-4 border border-muted/20 bg-white p-4" aria-labelledby="image-heading">
+            <section class="space-y-4 card p-4" aria-labelledby="image-heading">
                 <h2 id="image-heading" class="font-sans text-sm font-semibold uppercase tracking-wide">Featured image</h2>
 
                 @if ($image)
                     <img src="{{ $image->temporaryUrl() }}" alt="Preview of the selected image" class="w-full">
+                    <button type="button" wire:click="clearImage" class="text-sm text-red-700 hover:underline">Remove selected image</button>
                 @elseif ($article?->featured_image && ! $removeImage)
                     <img src="{{ $article->featured_image_url }}" alt="{{ $article->featured_image_alt }}" class="w-full">
-                    <label class="flex items-center gap-2 text-sm">
-                        <input type="checkbox" wire:model.live="removeImage" class="size-4 accent-brand">
-                        Remove image
-                    </label>
+                    <button type="button" wire:click="$set('removeImage', true)" wire:confirm="Remove this image? It is deleted when you save the article." class="text-sm text-red-700 hover:underline">Remove current image</button>
+                @elseif ($article?->featured_image && $removeImage)
+                    <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-900" role="status">
+                        The current image will be removed when you save.
+                        <button type="button" wire:click="$set('removeImage', false)" class="ml-1 font-medium underline">Undo</button>
+                    </p>
                 @endif
 
-                <x-admin.input label="Upload image" name="image" type="file" wire:model="image" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB. Resized to 1600 px wide." />
+                <x-admin.input label="Upload image" name="image" type="file" wire:key="image-{{ $imageInputVersion }}" wire:model="image" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB. Resized to 1600 px wide." />
                 <x-admin.input label="Alt text" name="featured_image_alt" wire:model="featured_image_alt" hint="Describe the image for people using screen readers. Required when there is an image." />
             </section>
 
-            <section class="space-y-4 border border-muted/20 bg-white p-4" aria-labelledby="seo-heading">
+            <section class="space-y-4 card p-4" aria-labelledby="seo-heading">
                 <h2 id="seo-heading" class="font-sans text-sm font-semibold uppercase tracking-wide">SEO</h2>
                 <x-admin.input label="Meta title" name="meta_title" wire:model="meta_title" hint="Optional. Up to 70 characters. Defaults to the title." />
                 <x-admin.textarea label="Meta description" name="meta_description" wire:model="meta_description" rows="3" hint="Optional. Up to 160 characters. Defaults to the excerpt." />

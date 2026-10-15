@@ -11,7 +11,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('components.layouts.admin')]
+#[Layout('components.layouts.guest')]
 #[Title('Sign in')]
 class Login extends Component
 {

@@ -70,7 +70,7 @@
         <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($categories as $category)
                 <li>
-                    <a href="{{ route('categories.show', $category->slug) }}" class="group flex h-full flex-col rounded-2xl border border-muted/20 bg-white p-6 transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md">
+                    <a href="{{ route('categories.show', $category->slug) }}" class="group flex h-full flex-col card p-6 transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md">
                         <h3 class="font-bold group-hover:text-brand">{{ $category->name }}</h3>
                         <p class="mt-2 flex-1 text-sm text-muted">{{ $category->description }}</p>
                         <p class="mt-4 text-xs font-semibold text-brand">{{ $category->articles_count }} {{ Str::plural('article', $category->articles_count) }} &rarr;</p>

@@ -43,7 +43,7 @@
         </p>
 
         @if ($articles->isEmpty())
-            <div class="rounded-xl border border-muted/20 bg-white p-8 text-center">
+            <div class="card p-8 text-center">
                 <p class="text-lg font-semibold">No articles found</p>
                 <p class="mt-1 text-muted">
                     @if ($isFiltered)
