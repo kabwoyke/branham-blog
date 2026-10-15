@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Support\Markdown;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 
@@ -35,6 +36,9 @@ class ArticleController extends Controller
         return view('articles.show', [
             'article' => $article,
             'related' => $article->related(),
+            'previous' => $article->isPublic() ? $article->previousArticle() : null,
+            'next' => $article->isPublic() ? $article->nextArticle() : null,
+            'headings' => Markdown::headings($article->body_html),
             'isPreview' => ! $article->isPublic(),
         ]);
     }

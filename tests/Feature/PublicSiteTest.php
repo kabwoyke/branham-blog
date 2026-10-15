@@ -99,7 +99,7 @@ class PublicSiteTest extends TestCase
             ->assertSee('Branham Samwel')
             ->assertSee($article->published_at->format('j F Y'))
             ->assertSee('min read')
-            ->assertSee('<h2>A subheading</h2>', false)
+            ->assertSee('<h2 id="a-subheading">A subheading</h2>', false)
             ->assertSee('linkedin.com/sharing/share-offsite', false)
             ->assertSee('mailto:?subject=', false)
             ->assertSee('Copy link')
@@ -231,5 +231,53 @@ class PublicSiteTest extends TestCase
             ->assertSee('Page not found')
             ->assertSee('Back to home')
             ->assertSee('Branham Samwel');
+    }
+
+    public function test_article_shows_table_of_contents_for_three_or_more_headings(): void
+    {
+        $article = Article::factory()->create([
+            'body' => '## First point
+
+text
+
+## Second point
+
+text
+
+### Detail
+
+text',
+        ]);
+
+        $this->get(route('articles.show', $article->slug))
+            ->assertOk()
+            ->assertSee('In this article')
+            ->assertSee('href="#first-point"', false)
+            ->assertSee('id="detail"', false);
+    }
+
+    public function test_article_hides_table_of_contents_for_short_articles(): void
+    {
+        $article = Article::factory()->create(['body' => '## Only one
+
+text']);
+
+        $this->get(route('articles.show', $article->slug))->assertOk()->assertDontSee('In this article');
+    }
+
+    public function test_article_links_to_previous_and_next_published_articles(): void
+    {
+        $older = Article::factory()->create(['published_at' => now()->subDays(3)]);
+        $middle = Article::factory()->create(['published_at' => now()->subDays(2)]);
+        $newer = Article::factory()->create(['published_at' => now()->subDay()]);
+        Article::factory()->draft()->create();
+
+        $this->get(route('articles.show', $middle->slug))
+            ->assertSee(route('articles.show', $older->slug), false)
+            ->assertSee(route('articles.show', $newer->slug), false);
+
+        $this->get(route('articles.show', $older->slug))
+            ->assertDontSee('rel="prev"', false)
+            ->assertSee('rel="next"', false);
     }
 }

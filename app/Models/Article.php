@@ -91,6 +91,28 @@ class Article extends Model
     }
 
     /**
+     * The next older published article, if any.
+     */
+    public function previousArticle(): ?Article
+    {
+        return static::published()
+            ->where('published_at', '<', $this->published_at)
+            ->latest('published_at')
+            ->first(['id', 'slug', 'title']);
+    }
+
+    /**
+     * The next newer published article, if any.
+     */
+    public function nextArticle(): ?Article
+    {
+        return static::published()
+            ->where('published_at', '>', $this->published_at)
+            ->oldest('published_at')
+            ->first(['id', 'slug', 'title']);
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function author(): BelongsTo

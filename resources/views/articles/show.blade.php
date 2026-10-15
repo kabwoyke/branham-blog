@@ -43,6 +43,19 @@
         </div>
     @endif
 
+    <div
+        class="fixed inset-x-0 top-0 z-50 h-1 bg-transparent"
+        aria-hidden="true"
+        x-data="{ progress: 0 }"
+        x-on:scroll.window.passive="
+            const rect = document.getElementById('article-body').getBoundingClientRect()
+            const span = rect.height - window.innerHeight
+            progress = span > 0 ? Math.min(100, Math.max(0, -rect.top / span * 100)) : 100
+        "
+    >
+        <div class="h-full bg-brand transition-[width] duration-100" x-bind:style="`width: ${progress}%`"></div>
+    </div>
+
     <article class="mx-auto max-w-3xl px-4 pt-14 sm:px-6">
         <header>
             <nav aria-label="Breadcrumb" class="text-sm text-muted">
@@ -79,7 +92,20 @@
             </figure>
         @endif
 
-        <div class="prose-article mt-10">
+        @if (count($headings) >= 3)
+            <nav aria-labelledby="toc-heading" class="mt-10 rounded-2xl border border-muted/20 p-5 sm:p-6">
+                <h2 id="toc-heading" class="eyebrow">In this article</h2>
+                <ol class="mt-3 space-y-1.5 text-sm">
+                    @foreach ($headings as $heading)
+                        <li class="{{ $heading['level'] === 3 ? 'pl-4' : '' }}">
+                            <a href="#{{ $heading['id'] }}" class="text-ink hover:text-brand">{{ $heading['text'] }}</a>
+                        </li>
+                    @endforeach
+                </ol>
+            </nav>
+        @endif
+
+        <div id="article-body" class="prose-article mt-10 [&_h2]:scroll-mt-24 [&_h3]:scroll-mt-24">
             {!! $article->body_html !!}
         </div>
 
@@ -101,6 +127,23 @@
             <button type="button" x-on:click="copy" class="btn btn-outline !px-4 !py-2">Copy link</button>
             <span class="text-sm font-semibold text-brand" role="status" aria-live="polite" x-cloak x-show="copied">Copied</span>
         </div>
+
+        @if ($previous || $next)
+            <nav aria-label="More articles" class="mt-10 grid gap-4 sm:grid-cols-2">
+                @if ($previous)
+                    <a href="{{ route('articles.show', $previous->slug) }}" rel="prev" class="rounded-2xl border border-muted/20 p-5 hover:border-brand">
+                        <span class="eyebrow">Previous</span>
+                        <span class="mt-2 block font-bold leading-snug">{{ $previous->title }}</span>
+                    </a>
+                @endif
+                @if ($next)
+                    <a href="{{ route('articles.show', $next->slug) }}" rel="next" class="rounded-2xl border border-muted/20 p-5 hover:border-brand sm:col-start-2 sm:text-right">
+                        <span class="eyebrow">Next</span>
+                        <span class="mt-2 block font-bold leading-snug">{{ $next->title }}</span>
+                    </a>
+                @endif
+            </nav>
+        @endif
 
         <aside class="mt-10 rounded-2xl bg-brand/10 p-6 sm:p-8" aria-labelledby="article-newsletter-heading">
             <h2 id="article-newsletter-heading" class="text-lg font-bold">Enjoyed this? Get new articles by email.</h2>
