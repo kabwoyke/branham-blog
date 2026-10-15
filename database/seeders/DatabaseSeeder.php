@@ -15,7 +15,10 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             CategorySeeder::class,
             SettingSeeder::class,
-            ArticleSeeder::class,
         ]);
+
+        if (! app()->isProduction()) {
+            $this->call(DevelopmentSeeder::class);
+        }
     }
 }
