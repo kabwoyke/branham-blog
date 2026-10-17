@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>You are offline | Branham Samwel</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #faf7f2;
+            color: #24282d;
+            font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        header { padding: 1.5rem 1rem; text-align: center; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem 5rem; }
+        .card { max-width: 32rem; text-align: center; }
+        .eyebrow { margin: 0; font-size: .875rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #2f5d50; }
+        h1 { margin: .75rem 0 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; }
+        p.lead { margin: 1rem 0 0; font-size: 1.125rem; line-height: 1.6; color: #5b6662; }
+        button {
+            margin-top: 2rem;
+            padding: .75rem 1.5rem;
+            border: 0;
+            border-radius: .5rem;
+            background: #2f5d50;
+            color: #fff;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover { background: #274d42; }
+        button:focus-visible { outline: 3px solid #2f5d50; outline-offset: 3px; }
+        @media (min-width: 640px) { h1 { font-size: 3rem; } }
+    </style>
+</head>
+<body>
+    <header>Branham Samwel</header>
+    <main>
+        <div class="card" role="status">
+            <p class="eyebrow">Offline</p>
+            <h1>You are not connected</h1>
+            <p class="lead">It looks like your internet connection has dropped. Check your connection and try again. Articles you have not opened yet will load once you are back online.</p>
+            <button type="button" id="retry">Try again</button>
+        </div>
+    </main>
+    <script>
+        document.getElementById('retry').addEventListener('click', function () { location.reload(); });
+        window.addEventListener('online', function () { location.reload(); });
+    </script>
+</body>
+</html>
