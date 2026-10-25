@@ -3,10 +3,13 @@
 namespace App\Livewire\Admin\Articles;
 
 use App\Enums\ArticleStatus;
+use App\Mail\ArticleNewsletter;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Subscriber;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -61,6 +64,29 @@ class Index extends Component
         $article->restore();
 
         session()->flash('status', "\"{$article->title}\" restored.");
+    }
+
+    public function sendNewsletter(int $articleId): void
+    {
+        $article = Article::published()->with('category')->findOrFail($articleId);
+        Gate::authorize('update', $article);
+
+        if ($article->newsletter_sent_at !== null) {
+            session()->flash('status', "\"{$article->title}\" was already sent to subscribers.");
+
+            return;
+        }
+
+        $sent = 0;
+
+        Subscriber::confirmed()->each(function (Subscriber $subscriber) use ($article, &$sent): void {
+            Mail::to($subscriber->email)->queue(new ArticleNewsletter($article, $subscriber));
+            $sent++;
+        });
+
+        $article->forceFill(['newsletter_sent_at' => now()])->saveQuietly();
+
+        session()->flash('status', "\"{$article->title}\" queued for {$sent} ".str('subscriber')->plural($sent).'.');
     }
 
     public function render(): View

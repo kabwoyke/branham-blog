@@ -54,6 +54,7 @@ class Article extends Model
             'status' => ArticleStatus::class,
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
+            'newsletter_sent_at' => 'datetime',
         ];
     }
 

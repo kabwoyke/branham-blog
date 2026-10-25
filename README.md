@@ -97,7 +97,7 @@ Target: a standard shared or VPS PHP host (PHP 8.3+, Nginx or Apache). No contai
    ```
    * * * * * cd /path/to/branham-blog && php artisan schedule:run >> /dev/null 2>&1
    ```
-8. **Queue worker** (optional: emails are currently sent immediately, so a worker is only needed if you queue mail or jobs later): run `php artisan queue:work --tries=3 --stop-when-empty` from cron every minute, or keep `php artisan queue:work` alive with Supervisor. Set `QUEUE_CONNECTION=sync` to skip the worker.
+8. **Queue worker** (required for newsletter sending, which queues one email per subscriber; confirmation and contact emails are sent immediately): run `php artisan queue:work --tries=3 --stop-when-empty` from cron every minute, or keep `php artisan queue:work` alive with Supervisor. Set `QUEUE_CONNECTION=sync` to skip the worker.
 9. **Permissions:** `storage/` and `bootstrap/cache/` must be writable by the web user.
 10. **Backups:** schedule a daily database dump (for example `mysqldump`) and back up `storage/app/public` (uploaded images).
 11. **Before launch:** confirm the phone country code (the contact page needs it for the WhatsApp link), set the LinkedIn URL and About text in the admin settings, and replace the wordmark if a logo is supplied.

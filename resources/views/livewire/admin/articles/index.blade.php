@@ -55,6 +55,13 @@
                             @if ($article->trashed())
                                 <button type="button" wire:click="restore({{ $article->id }})" class="text-brand hover:underline">Restore</button>
                             @else
+                                @if ($article->status === \App\Enums\ArticleStatus::Published)
+                                    @if ($article->newsletter_sent_at)
+                                        <span class="mr-3 text-xs text-muted" title="{{ $article->newsletter_sent_at->format('j M Y, H:i') }}">Emailed</span>
+                                    @else
+                                        <button type="button" wire:click="sendNewsletter({{ $article->id }})" wire:confirm="Email this article to all confirmed subscribers? This cannot be repeated." class="mr-3 text-brand hover:underline">Email subscribers</button>
+                                    @endif
+                                @endif
                                 <a href="{{ route('admin.articles.edit', $article) }}" class="text-brand hover:underline">Edit</a>
                                 <button type="button" wire:click="delete({{ $article->id }})" wire:confirm="Move this article to the trash?" class="ml-3 text-red-700 hover:underline">Delete</button>
                             @endif
