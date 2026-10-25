@@ -57,7 +57,7 @@
     </div>
 
     <article class="mx-auto max-w-3xl px-4 pt-14 sm:px-6">
-        <header>
+        <header class="animate-fade-up">
             <nav aria-label="Breadcrumb" class="text-sm text-muted">
                 <ol class="flex flex-wrap items-center gap-2">
                     <li><a href="{{ route('articles.index') }}" class="hover:text-brand">Articles</a></li>
@@ -66,8 +66,8 @@
                 </ol>
             </nav>
             <p class="eyebrow mt-6">{{ $article->type->label() }}</p>
-            <h1 class="mt-3 text-4xl font-extrabold leading-[1.1] sm:text-5xl">{{ $article->title }}</h1>
-            <p class="mt-5 text-xl leading-relaxed text-muted">{{ $article->excerpt }}</p>
+            <h1 class="mt-3 text-3xl font-extrabold leading-[1.15] sm:text-5xl sm:leading-[1.1]">{{ $article->title }}</h1>
+            <p class="mt-5 text-lg leading-relaxed text-muted sm:text-xl">{{ $article->excerpt }}</p>
 
             <p class="mt-6 border-t border-muted/15 pt-5 text-sm text-muted">
                 By <span class="font-semibold text-ink">{{ $article->author->name }}</span>
@@ -145,7 +145,7 @@
             </nav>
         @endif
 
-        <aside class="mt-10 rounded-2xl bg-brand/10 p-6 sm:p-8" aria-labelledby="article-newsletter-heading">
+        <aside data-reveal class="mt-10 rounded-2xl bg-brand/10 p-6 sm:p-8" aria-labelledby="article-newsletter-heading">
             <h2 id="article-newsletter-heading" class="text-lg font-bold">Enjoyed this? Get new articles by email.</h2>
             <div class="mt-4">
                 <livewire:newsletter.signup location="article" />
@@ -154,7 +154,7 @@
     </article>
 
     @if ($related->isNotEmpty())
-        <section class="mx-auto mt-24 max-w-6xl border-t border-muted/15 px-4 pt-14 sm:px-6" aria-labelledby="related-heading">
+        <section data-reveal class="mx-auto mt-24 max-w-6xl border-t border-muted/15 px-4 pt-14 sm:px-6" aria-labelledby="related-heading">
             <h2 id="related-heading" class="section-title">Related articles</h2>
             <div class="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($related as $item)

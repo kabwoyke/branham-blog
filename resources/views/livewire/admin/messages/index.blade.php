@@ -1,5 +1,5 @@
 <div>
-    <h1 class="text-3xl font-bold">Messages</h1>
+    <h1 class="text-2xl font-bold sm:text-3xl">Messages</h1>
 
     <label class="mt-4 flex items-center gap-2 text-sm">
         <input type="checkbox" wire:model.live="unreadOnly" class="size-4 accent-brand">
@@ -9,8 +9,8 @@
     <ul class="mt-6 divide-y divide-muted/20 card">
         @forelse ($messages as $message)
             <li class="px-4 py-3" wire:key="message-{{ $message->id }}">
-                <div class="flex items-start justify-between gap-4">
-                    <button type="button" wire:click="open({{ $message->id }})" class="text-left" aria-expanded="{{ $openId === $message->id ? 'true' : 'false' }}">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                    <button type="button" wire:click="open({{ $message->id }})" class="min-w-0 break-words text-left"aria-expanded="{{ $openId === $message->id ? 'true' : 'false' }}">
                         <span @class(['block text-sm', 'font-semibold' => ! $message->isRead()])>
                             @unless ($message->isRead())<span class="mr-1 text-brand" aria-label="Unread">●</span>@endunless{{ $message->subject }}
                         </span>

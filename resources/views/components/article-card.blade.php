@@ -1,6 +1,6 @@
 @props(['article', 'large' => false, 'horizontal' => false])
 
-<article {{ $attributes->class(['group relative flex', 'flex-col' => ! $horizontal, 'flex-col gap-6 md:flex-row md:items-center md:gap-10' => $horizontal]) }}>
+<article data-reveal {{ $attributes->class(['group relative flex', 'flex-col' => ! $horizontal, 'flex-col gap-6 md:flex-row md:items-center md:gap-10' => $horizontal]) }}>
     <div @class(['overflow-hidden rounded-2xl bg-brand/10', 'md:w-3/5 md:shrink-0' => $horizontal])>
         @if ($article->featured_image_url)
             <img

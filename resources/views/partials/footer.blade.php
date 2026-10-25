@@ -8,7 +8,6 @@
     <div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.2fr_1fr_1.4fr]">
         <div>
             <p class="flex items-center gap-2 text-lg font-extrabold text-white">
-                <span class="inline-block size-2.5 rounded-full bg-white/80" aria-hidden="true"></span>
                 {{ config('app.name') }}
             </p>
             @if ($tagline)

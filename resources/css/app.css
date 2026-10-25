@@ -18,6 +18,16 @@
 @layer base {
     html {
         scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        overflow-x: clip;
+    }
+
+    img,
+    video {
+        @apply max-w-full;
     }
 
     body {
@@ -28,7 +38,7 @@
     h2,
     h3,
     h4 {
-        @apply tracking-tight;
+        @apply tracking-tight wrap-break-word;
     }
 
     [x-cloak] {
@@ -51,7 +61,7 @@
 }
 
 @utility btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-colors;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 active:translate-y-0;
 }
 
 @utility btn-primary {
@@ -71,7 +81,7 @@
 }
 
 @utility prose-article {
-    @apply prose max-w-[68ch] text-lg leading-relaxed prose-img:rounded-xl prose-figcaption:text-center;
+    @apply prose max-w-[68ch] text-base leading-relaxed wrap-break-word sm:text-lg prose-img:rounded-xl prose-figcaption:text-center prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto;
     --tw-prose-body: var(--color-ink);
     --tw-prose-headings: var(--color-ink);
     --tw-prose-lead: var(--color-muted);
@@ -94,4 +104,72 @@
 
 @utility field {
     @apply block w-full rounded-lg border border-muted/40 bg-white px-3 py-2 text-sm shadow-sm;
+}
+
+@theme {
+    --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-fade-in: fade-in 0.6s ease-out both;
+
+    @keyframes fade-up {
+        from {
+            opacity: 0;
+            transform: translateY(1.25rem);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}
+
+@layer components {
+    .reveal {
+        opacity: 0;
+        transform: translateY(1.5rem);
+        transition:
+            opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.is-visible {
+        opacity: 1;
+        transform: none;
+    }
+
+    .reveal:nth-child(3n + 2) {
+        transition-delay: 0.08s;
+    }
+
+    .reveal:nth-child(3n + 3) {
+        transition-delay: 0.16s;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        transition-duration: 0.01ms !important;
+    }
 }

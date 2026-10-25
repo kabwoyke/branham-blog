@@ -1,10 +1,10 @@
 <div>
-    <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-bold">Articles</h1>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold sm:text-3xl">Articles</h1>
         <a href="{{ route('admin.articles.create') }}" class="rounded-lg bg-brand px-4 py-2 shadow-sm text-sm font-medium text-white hover:bg-brand/90">New article</a>
     </div>
 
-    <div class="mt-6 grid gap-4 md:grid-cols-4">
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         <x-admin.input label="Search titles" name="search" type="search" wire:model.live.debounce.300ms="search" />
         <x-admin.select label="Status" name="status" wire:model.live="status">
             <option value="">All statuses</option>
@@ -29,9 +29,9 @@
             <thead class="border-b border-muted/20 text-xs uppercase tracking-wide text-muted">
                 <tr>
                     <th scope="col" class="px-4 py-3">Title</th>
-                    <th scope="col" class="px-4 py-3">Category</th>
+                    <th scope="col" class="hidden px-4 py-3 md:table-cell">Category</th>
                     <th scope="col" class="px-4 py-3">Status</th>
-                    <th scope="col" class="px-4 py-3">Date</th>
+                    <th scope="col" class="hidden px-4 py-3 sm:table-cell">Date</th>
                     <th scope="col" class="px-4 py-3 text-right">Actions</th>
                 </tr>
             </thead>
@@ -48,10 +48,10 @@
                                 <span class="ml-1 text-xs text-brand">★ Featured</span>
                             @endif
                         </td>
-                        <td class="px-4 py-3 text-muted">{{ $article->category->name }}</td>
+                        <td class="hidden px-4 py-3 text-muted md:table-cell">{{ $article->category->name }}</td>
                         <td class="px-4 py-3">{{ $article->status->label() }}</td>
-                        <td class="px-4 py-3 text-muted">{{ $article->published_at?->format('j M Y, H:i') ?? '—' }}</td>
-                        <td class="px-4 py-3 text-right">
+                        <td class="hidden px-4 py-3 text-muted sm:table-cell">{{ $article->published_at?->format('j M Y, H:i') ?? '—' }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-right">
                             @if ($article->trashed())
                                 <button type="button" wire:click="restore({{ $article->id }})" class="text-brand hover:underline">Restore</button>
                             @else

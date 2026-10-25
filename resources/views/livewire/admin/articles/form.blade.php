@@ -1,6 +1,6 @@
 <div>
-    <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-bold">{{ $article ? 'Edit article' : 'New article' }}</h1>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold sm:text-3xl">{{ $article ? 'Edit article' : 'New article' }}</h1>
         <a href="{{ route('admin.articles.index') }}" class="text-sm text-muted hover:text-brand">&larr; All articles</a>
     </div>
 

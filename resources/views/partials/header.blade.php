@@ -11,7 +11,6 @@
 <header class="sticky top-0 z-40 border-b border-muted/15 bg-paper/90 backdrop-blur" x-data="{ open: false }">
     <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <a href="{{ route('home') }}" class="flex items-center gap-2 text-xl font-extrabold tracking-tight text-ink">
-            <span class="inline-block size-2.5 rounded-full bg-brand" aria-hidden="true"></span>
             {{ config('app.name') }}
         </a>
 
@@ -31,7 +30,7 @@
         </nav>
     </div>
 
-    <nav id="mobile-nav" x-cloak x-show="open" aria-label="Mobile" class="border-t border-muted/15 bg-paper px-4 py-3 text-sm font-semibold lg:hidden">
+    <nav id="mobile-nav" x-cloak x-show="open" x-transition:enter="transition duration-200 ease-out" x-transition:enter-start="-translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100" x-transition:leave="transition duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-label="Mobile" class="border-t border-muted/15 bg-paper px-4 py-3 text-sm font-semibold lg:hidden">
         @foreach ($links as $link)
             @php($active = request()->routeIs(...$link['match']))
             <a href="{{ route($link['route']) }}" @if ($active) aria-current="page" @endif @class(['block rounded-lg px-3 py-2.5', 'bg-brand/10 text-brand' => $active, 'text-ink hover:text-brand' => ! $active])>{{ $link['label'] }}</a>

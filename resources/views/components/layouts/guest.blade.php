@@ -18,7 +18,6 @@
                 <div class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-white/5"></div>
 
                 <a href="{{ route('home') }}" tabindex="-1" class="relative flex items-center gap-2 text-xl font-extrabold tracking-tight">
-                    <span class="inline-block size-2.5 rounded-full bg-white"></span>
                     {{ config('app.name') }}
                 </a>
 
@@ -32,7 +31,6 @@
             <div class="flex items-center justify-center px-6 py-12 lg:col-span-3">
                 <div class="w-full max-w-sm">
                     <a href="{{ route('home') }}" class="mb-10 flex items-center gap-2 text-xl font-extrabold tracking-tight lg:hidden">
-                        <span class="inline-block size-2.5 rounded-full bg-brand" aria-hidden="true"></span>
                         {{ config('app.name') }}
                     </a>
 

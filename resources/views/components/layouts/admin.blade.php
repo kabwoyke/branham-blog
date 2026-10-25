@@ -28,13 +28,12 @@
         <header class="sticky top-0 z-40 border-b border-muted/15 bg-white/90 backdrop-blur">
             <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 text-lg font-extrabold tracking-tight">
-                    <span class="inline-block size-2.5 rounded-full bg-brand" aria-hidden="true"></span>
                     {{ config('app.name') }}
                     <span class="rounded-full bg-brand/10 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-brand">Admin</span>
                 </a>
 
                 @auth
-                    <nav aria-label="Admin" class="flex flex-wrap items-center gap-1 text-sm font-semibold">
+                    <nav aria-label="Admin" class="-mx-4 flex w-[calc(100%+2rem)] items-center gap-1 overflow-x-auto px-4 pb-1 text-sm font-semibold whitespace-nowrap sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                         @foreach ($links as $link)
                             @php($active = request()->routeIs($link['route'], str_replace('.index', '.*', $link['route'])))
                             <a href="{{ route($link['route']) }}" @if ($active) aria-current="page" @endif @class(['rounded-full px-3 py-1.5 transition-colors', 'bg-brand/10 text-brand' => $active, 'hover:bg-brand/5 hover:text-brand' => ! $active])>{{ $link['label'] }}</a>
@@ -52,7 +51,7 @@
 
         <x-flash />
 
-        <main id="main" class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <main id="main" class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
             {{ $slot }}
         </main>
 
