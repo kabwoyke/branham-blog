@@ -153,6 +153,12 @@
         </aside>
     </article>
 
+    @if ($article->isPublic())
+        <div class="mx-auto mt-16 max-w-3xl px-4 sm:px-6">
+            <livewire:comments.section :article-id="$article->id" />
+        </div>
+    @endif
+
     @if ($related->isNotEmpty())
         <section data-reveal class="mx-auto mt-24 max-w-6xl border-t border-muted/15 px-4 pt-14 sm:px-6" aria-labelledby="related-heading">
             <h2 id="related-heading" class="section-title">Related articles</h2>

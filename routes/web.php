@@ -11,6 +11,7 @@ use App\Http\Controllers\SeoController;
 use App\Livewire\Admin\Articles\Form as ArticleForm;
 use App\Livewire\Admin\Articles\Index as ArticleIndex;
 use App\Livewire\Admin\Categories\Index as CategoryIndex;
+use App\Livewire\Admin\Comments\Index as CommentIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Login;
 use App\Livewire\Admin\Messages\Index as MessageIndex;
@@ -51,6 +52,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('subscribers', SubscriberIndex::class)->name('subscribers.index');
         Route::get('subscribers/export', SubscriberExportController::class)->name('subscribers.export');
         Route::get('messages', MessageIndex::class)->name('messages.index');
+        Route::get('comments', CommentIndex::class)->name('comments.index');
         Route::get('settings', Settings::class)->name('settings');
     });
 });

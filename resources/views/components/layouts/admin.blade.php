@@ -7,6 +7,7 @@
         ['label' => 'Categories', 'route' => 'admin.categories.index'],
         ['label' => 'Subscribers', 'route' => 'admin.subscribers.index'],
         ['label' => 'Messages', 'route' => 'admin.messages.index'],
+        ['label' => 'Comments', 'route' => 'admin.comments.index'],
         ['label' => 'Settings', 'route' => 'admin.settings'],
     ];
 @endphp

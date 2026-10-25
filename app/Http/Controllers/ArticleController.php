@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\ArticleView;
 use App\Support\Markdown;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class ArticleController extends Controller
@@ -25,13 +27,17 @@ class ArticleController extends Controller
     /**
      * Guests only ever see published articles. The admin may preview drafts and scheduled articles.
      */
-    public function show(string $slug): View
+    public function show(Request $request, string $slug): View
     {
         $article = Article::query()
             ->with(['category', 'author'])
             ->where('slug', $slug)
             ->when(! Gate::allows('access-admin'), fn ($query) => $query->published())
             ->firstOrFail();
+
+        if ($article->isPublic()) {
+            ArticleView::record($article, $request);
+        }
 
         return view('articles.show', [
             'article' => $article,
