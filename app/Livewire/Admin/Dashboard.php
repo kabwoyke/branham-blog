@@ -25,6 +25,7 @@ class Dashboard extends Component
             'scheduledCount' => Article::where('status', ArticleStatus::Scheduled)->count(),
             'subscriberCount' => Subscriber::confirmed()->count(),
             'unreadCount' => ContactMessage::unread()->count(),
+            'dailyViews' => $this->dailyViews(),
             'pendingCommentCount' => Comment::pending()->count(),
             'viewsLast30Days' => (int) ArticleView::where('viewed_on', '>=', today()->subDays(29))->sum('views'),
             'topArticles' => Article::query()
@@ -35,5 +36,22 @@ class Dashboard extends Component
                 ->get(),
             'recentArticles' => Article::with('category')->latest('updated_at')->limit(5)->get(),
         ]);
+    }
+
+    /**
+     * @return array<string, int> Views per day for the last 14 days, oldest first.
+     */
+    private function dailyViews(): array
+    {
+        $counts = ArticleView::query()
+            ->where('viewed_on', '>=', today()->subDays(13))
+            ->selectRaw('viewed_on, sum(views) as total')
+            ->groupBy('viewed_on')
+            ->pluck('total', 'viewed_on')
+            ->mapWithKeys(fn ($total, $day) => [substr((string) $day, 0, 10) => (int) $total]);
+
+        return collect(range(13, 0))
+            ->mapWithKeys(fn (int $ago) => [today()->subDays($ago)->toDateString() => $counts->get(today()->subDays($ago)->toDateString(), 0)])
+            ->all();
     }
 }
