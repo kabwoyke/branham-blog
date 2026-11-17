@@ -22,6 +22,7 @@ use App\Livewire\Articles\Browse;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
 Route::get('/articles', Browse::class)->name('articles.index');
 Route::get('/featured', [ArticleController::class, 'featured'])->name('articles.featured');
 Route::get('/articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');
