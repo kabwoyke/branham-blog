@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Messages;
 
+use App\Livewire\Concerns\PollsForChanges;
 use App\Models\ContactMessage;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -14,7 +15,7 @@ use Livewire\WithPagination;
 #[Title('Messages')]
 class Index extends Component
 {
-    use WithPagination;
+    use PollsForChanges, WithPagination;
 
     #[Url]
     public bool $unreadOnly = false;
@@ -52,7 +53,15 @@ class Index extends Component
         ContactMessage::findOrFail($messageId)->delete();
         $this->openId = null;
 
-        session()->flash('status', 'Message deleted.');
+        $this->dispatch('notify', type: 'status', message: 'Message deleted.');
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function liveTopics(): array
+    {
+        return ['contact_messages'];
     }
 
     public function render(): View

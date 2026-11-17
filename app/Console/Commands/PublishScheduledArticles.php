@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\ArticleStatus;
 use App\Models\Article;
+use App\Support\LiveUpdates;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
@@ -18,6 +19,10 @@ class PublishScheduledArticles extends Command
             ->where('status', ArticleStatus::Scheduled)
             ->where('published_at', '<=', now())
             ->update(['status' => ArticleStatus::Published]);
+
+        if ($count > 0) {
+            LiveUpdates::touch('articles');
+        }
 
         $this->info("Published {$count} scheduled article(s).");
 

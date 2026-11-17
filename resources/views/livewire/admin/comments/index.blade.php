@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.10s.visible="checkForChanges">
     <h1 class="text-2xl font-bold sm:text-3xl">Comments</h1>
 
     <div class="mt-4 max-w-xs">

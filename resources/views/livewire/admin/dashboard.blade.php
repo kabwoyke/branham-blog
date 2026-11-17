@@ -11,7 +11,7 @@
     $peak = max(1, max($dailyViews));
 @endphp
 
-<div>
+<div wire:poll.15s.visible="checkForChanges">
     <section class="relative overflow-hidden rounded-2xl bg-linear-to-br from-brand via-[#3b7364] to-[#1d3d34] p-6 text-white shadow-lg sm:p-8">
         <div class="pointer-events-none absolute -right-10 -top-16 size-56 rounded-full bg-white/10 blur-2xl" aria-hidden="true"></div>
         <div class="pointer-events-none absolute -bottom-20 right-1/3 size-48 rounded-full bg-amber-300/20 blur-3xl" aria-hidden="true"></div>
@@ -27,7 +27,7 @@
                     @endif
                 </p>
             </div>
-            <a href="{{ route('admin.articles.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-brand shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
+            <a href="{{ route('admin.articles.create') }}" wire:navigate class="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-brand shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                 New article
             </a>
@@ -87,12 +87,12 @@
         <section aria-labelledby="recent-heading">
             <div class="flex items-center justify-between">
                 <h2 id="recent-heading" class="text-lg font-semibold">Recently edited</h2>
-                <a href="{{ route('admin.articles.index') }}" class="text-sm font-medium text-brand hover:underline">All articles</a>
+                <a href="{{ route('admin.articles.index') }}" wire:navigate class="text-sm font-medium text-brand hover:underline">All articles</a>
             </div>
             <ul class="mt-3 divide-y divide-muted/15 card">
                 @forelse ($recentArticles as $article)
                     <li class="flex items-center justify-between gap-4 px-4 py-3 text-sm transition hover:bg-brand/5">
-                        <a href="{{ route('admin.articles.edit', $article) }}" class="min-w-0 flex-1 truncate font-medium hover:text-brand">{{ $article->title }}</a>
+                        <a href="{{ route('admin.articles.edit', $article) }}" wire:navigate class="min-w-0 flex-1 truncate font-medium hover:text-brand">{{ $article->title }}</a>
                         <span @class([
                             'shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold',
                             'bg-emerald-100 text-emerald-700' => $article->status === \App\Enums\ArticleStatus::Published,

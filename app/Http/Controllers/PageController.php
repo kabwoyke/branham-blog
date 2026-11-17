@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use App\Support\Markdown;
+use App\Support\SocialLinks;
 use Illuminate\Contracts\View\View;
 
 class PageController extends Controller
@@ -25,7 +26,7 @@ class PageController extends Controller
             'email' => Setting::get('contact_email'),
             'phone' => $phone,
             'whatsappUrl' => $hasCountryCode ? 'https://wa.me/'.preg_replace('/\D/', '', $phone) : null,
-            'linkedin' => Setting::get('linkedin_url'),
+            'socialLinks' => SocialLinks::filled(),
         ]);
     }
 }

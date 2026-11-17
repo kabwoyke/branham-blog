@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksLiveUpdates;
 use Database\Factories\SubscriberFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,7 +14,7 @@ use Illuminate\Support\Str;
 class Subscriber extends Model
 {
     /** @use HasFactory<SubscriberFactory> */
-    use HasFactory;
+    use HasFactory, TracksLiveUpdates;
 
     protected static function booted(): void
     {

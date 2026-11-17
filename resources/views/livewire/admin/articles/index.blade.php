@@ -1,7 +1,7 @@
-<div>
+<div wire:poll.10s.visible="checkForChanges">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h1 class="text-2xl font-bold sm:text-3xl">Articles</h1>
-        <a href="{{ route('admin.articles.create') }}" class="rounded-lg bg-brand px-4 py-2 shadow-sm text-sm font-medium text-white hover:bg-brand/90">New article</a>
+        <a href="{{ route('admin.articles.create') }}" wire:navigate class="rounded-lg bg-brand px-4 py-2 shadow-sm text-sm font-medium text-white hover:bg-brand/90">New article</a>
     </div>
 
     <div class="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -42,7 +42,7 @@
                             @if ($article->trashed())
                                 {{ $article->title }}
                             @else
-                                <a href="{{ route('admin.articles.edit', $article) }}" class="hover:text-brand">{{ $article->title }}</a>
+                                <a href="{{ route('admin.articles.edit', $article) }}" wire:navigate class="hover:text-brand">{{ $article->title }}</a>
                             @endif
                             @if ($article->is_featured)
                                 <span class="ml-1 text-xs text-brand">★ Featured</span>
@@ -50,7 +50,7 @@
                         </td>
                         <td class="hidden px-4 py-3 text-muted md:table-cell">{{ $article->category->name }}</td>
                         <td class="px-4 py-3">{{ $article->status->label() }}</td>
-                        <td class="hidden px-4 py-3 text-muted sm:table-cell">{{ $article->published_at?->format('j M Y, H:i') ?? '—' }}</td>
+                        <td class="hidden px-4 py-3 text-muted sm:table-cell">@if ($article->published_at){{ $article->published_at->copy()->setTimezone(config('app.publishing_timezone'))->format('j M Y, H:i') }} <span class="text-xs">EAT</span>@else—@endif</td>
                         <td class="whitespace-nowrap px-4 py-3 text-right">
                             @if ($article->trashed())
                                 <button type="button" wire:click="restore({{ $article->id }})" class="text-brand hover:underline">Restore</button>
@@ -62,7 +62,7 @@
                                         <button type="button" wire:click="sendNewsletter({{ $article->id }})" wire:confirm="Email this article to all confirmed subscribers? This cannot be repeated." class="mr-3 text-brand hover:underline">Email subscribers</button>
                                     @endif
                                 @endif
-                                <a href="{{ route('admin.articles.edit', $article) }}" class="text-brand hover:underline">Edit</a>
+                                <a href="{{ route('admin.articles.edit', $article) }}" wire:navigate class="text-brand hover:underline">Edit</a>
                                 <button type="button" wire:click="delete({{ $article->id }})" wire:confirm="Move this article to the trash?" class="ml-3 text-red-700 hover:underline">Delete</button>
                             @endif
                         </td>

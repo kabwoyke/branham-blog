@@ -101,6 +101,10 @@ class PublicSiteTest extends TestCase
             ->assertSee('min read')
             ->assertSee('<h2 id="a-subheading">A subheading</h2>', false)
             ->assertSee('linkedin.com/sharing/share-offsite', false)
+            ->assertSee('x.com/intent/post?text=A+readable+article&url=', false)
+            ->assertSee('facebook.com/sharer/sharer.php?u=', false)
+            ->assertSee("shareToApp('Instagram')", false)
+            ->assertSee("shareToApp('TikTok')", false)
             ->assertSee('mailto:?subject=', false)
             ->assertSee('Copy link')
             ->assertDontSee('Preview:');
@@ -222,6 +226,23 @@ class PublicSiteTest extends TestCase
         $this->get(route('home'))
             ->assertSee('mailto:hello@example.test', false)
             ->assertSee('https://www.linkedin.com/in/example', false);
+    }
+
+    public function test_social_profiles_appear_in_the_footer_and_contact_page_only_when_set(): void
+    {
+        Setting::set('x_url', 'https://x.com/branham_s');
+        Setting::set('instagram_url', 'https://www.instagram.com/branham');
+        Setting::set('tiktok_url', '');
+
+        foreach ([route('home'), route('contact')] as $page) {
+            $this->get($page)
+                ->assertSee('https://x.com/branham_s', false)
+                ->assertSee('https://www.instagram.com/branham', false)
+                ->assertDontSee('>TikTok</a>', false);
+        }
+
+        $this->get(route('home'))
+            ->assertSee('<meta name="twitter:site" content="@branham_s">', false);
     }
 
     public function test_friendly_404_page_uses_the_site_design(): void

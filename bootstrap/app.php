@@ -13,9 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: env('TRUSTED_PROXIES', '*'));
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
         $middleware->redirectUsersTo(fn () => route('admin.dashboard'));
         $middleware->web(append: [SecurityHeaders::class]);
+        // Mail providers' one-click unsubscribe (RFC 8058) posts without a CSRF token; the secret token in the URL protects it.
+        $middleware->preventRequestForgery(except: ['newsletter/unsubscribe/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

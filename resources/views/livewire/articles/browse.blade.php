@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.60s.visible="checkForChanges">
     <x-page-header :eyebrow="$category ? 'Topic' : null" :title="$heading" :intro="$intro">
         <form role="search" id="search" wire:submit.prevent class="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
             <div>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ArticleStatus;
 use App\Enums\ArticleType;
+use App\Models\Concerns\TracksLiveUpdates;
 use App\Support\ImageStore;
 use App\Support\Markdown;
 use Database\Factories\ArticleFactory;
@@ -27,7 +28,7 @@ use Illuminate\Support\Facades\Storage;
 class Article extends Model
 {
     /** @use HasFactory<ArticleFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, TracksLiveUpdates;
 
     private const WORDS_PER_MINUTE = 200;
 

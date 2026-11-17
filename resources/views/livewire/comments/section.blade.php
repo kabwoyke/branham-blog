@@ -1,4 +1,4 @@
-<section aria-labelledby="comments-heading">
+<section aria-labelledby="comments-heading" wire:poll.60s.visible="checkForChanges">
     <h2 id="comments-heading" class="text-xl font-bold">Comments @if ($comments->isNotEmpty())<span class="text-muted">({{ $comments->count() }})</span>@endif</h2>
 
     <ul class="mt-6 space-y-6">

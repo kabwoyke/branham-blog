@@ -37,6 +37,89 @@ class Markdown
         ], $matches);
     }
 
+    /**
+     * The h2 and h3 sections of a Markdown document, keyed the same way as the rendered heading ids.
+     *
+     * Headings inside fenced code blocks are ignored.
+     *
+     * @return list<array{key: string, text: string, level: int, line: int}>
+     */
+    public static function sections(?string $markdown): array
+    {
+        $sections = [];
+        $used = [];
+        $fence = null;
+
+        foreach (preg_split('/\R/', $markdown ?? '') ?: [] as $number => $line) {
+            if (preg_match('/^\s{0,3}(`{3,}|~{3,})/', $line, $marker) === 1) {
+                if ($fence === null) {
+                    $fence = $marker[1][0];
+                } elseif ($marker[1][0] === $fence) {
+                    $fence = null;
+                }
+
+                continue;
+            }
+
+            if ($fence !== null || preg_match('/^\s{0,3}(#{2,3})\s+(.+?)(?:\s+#+)?\s*$/', $line, $match) !== 1) {
+                continue;
+            }
+
+            $text = trim($match[2]);
+            $base = Str::slug(html_entity_decode(strip_tags(Str::markdown($text)))) ?: 'section';
+            $key = $base;
+
+            for ($suffix = 2; in_array($key, $used, true); $suffix++) {
+                $key = "{$base}-{$suffix}";
+            }
+
+            $used[] = $key;
+            $sections[] = ['key' => $key, 'text' => $text, 'level' => strlen($match[1]), 'line' => $number];
+        }
+
+        return $sections;
+    }
+
+    /**
+     * Insert a Markdown snippet at a placement: "start", "end", "below:{key}" (just under that heading)
+     * or "section-end:{key}" (after the last paragraph of that section, before the next heading of the same or higher level).
+     */
+    public static function insertAt(string $markdown, string $placement, string $snippet): string
+    {
+        $snippet = trim($snippet);
+        $lines = preg_split('/\R/', $markdown) ?: [];
+
+        [$where, $key] = array_pad(explode(':', $placement, 2), 2, null);
+        $sections = self::sections($markdown);
+        $index = array_search($key, array_column($sections, 'key'), true);
+
+        $splitAt = match (true) {
+            $where === 'start' => 0,
+            $where === 'below' && $index !== false => $sections[$index]['line'] + 1,
+            $where === 'section-end' && $index !== false => self::sectionEndLine($sections, $index, count($lines)),
+            default => count($lines),
+        };
+
+        $before = rtrim(implode("\n", array_slice($lines, 0, $splitAt)));
+        $after = ltrim(implode("\n", array_slice($lines, $splitAt)), "\r\n");
+
+        return implode("\n\n", array_filter([$before, $snippet, $after], fn (string $part): bool => $part !== ''))."\n";
+    }
+
+    /**
+     * @param  list<array{key: string, text: string, level: int, line: int}>  $sections
+     */
+    private static function sectionEndLine(array $sections, int $index, int $lineCount): int
+    {
+        for ($next = $index + 1; $next < count($sections); $next++) {
+            if ($sections[$next]['level'] <= $sections[$index]['level']) {
+                return $sections[$next]['line'];
+            }
+        }
+
+        return $lineCount;
+    }
+
     private static function addHeadingIds(string $html): string
     {
         $used = [];

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Comments;
 
+use App\Livewire\Concerns\PollsForChanges;
 use App\Models\Comment;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -14,7 +15,7 @@ use Livewire\WithPagination;
 #[Title('Comments')]
 class Index extends Component
 {
-    use WithPagination;
+    use PollsForChanges, WithPagination;
 
     #[Url]
     public string $filter = 'pending';
@@ -38,7 +39,15 @@ class Index extends Component
     {
         Comment::findOrFail($commentId)->delete();
 
-        session()->flash('status', 'Comment deleted.');
+        $this->dispatch('notify', type: 'status', message: 'Comment deleted.');
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function liveTopics(): array
+    {
+        return ['comments'];
     }
 
     public function render(): View

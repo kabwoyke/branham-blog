@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
@@ -94,6 +95,28 @@ class ArticleAdminTest extends TestCase
         $this->assertSame(ArticleStatus::Scheduled, $article->status);
         $this->assertTrue($article->published_at->isFuture());
         $this->assertSame(0, Article::published()->count());
+    }
+
+    public function test_scheduled_time_is_entered_in_east_africa_time_and_stored_in_utc(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-05 08:00', 'UTC'));
+
+        $this->fillForm(['status' => 'scheduled', 'published_at' => '2026-11-06T09:00'])->call('save')->assertHasNoErrors();
+
+        $article = Article::firstOrFail();
+        $this->assertSame('2026-11-06 06:00:00', $article->published_at->setTimezone('UTC')->format('Y-m-d H:i:s'));
+
+        Livewire::test(Form::class, ['article' => $article])->assertSet('published_at', '2026-11-06T09:00');
+        Livewire::test(Index::class)->assertSee('6 Nov 2026, 09:00');
+    }
+
+    public function test_a_time_already_past_in_east_africa_time_cannot_be_scheduled(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-05 08:00', 'UTC'));
+
+        $this->fillForm(['status' => 'scheduled', 'published_at' => '2026-11-05T10:30'])
+            ->call('save')
+            ->assertHasErrors('published_at');
     }
 
     public function test_scheduling_requires_a_future_date(): void
@@ -258,6 +281,82 @@ class ArticleAdminTest extends TestCase
             ->assertSet('bodyImageAlt', '');
 
         $this->assertCount(1, Storage::disk('public')->files('articles/body'));
+    }
+
+    public function test_supporting_image_can_be_placed_in_a_chosen_section(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test(Form::class)
+            ->set('body', "Intro\n\n## Findings\n\nThe data.\n\n## Outlook\n\nNext.")
+            ->assertSee('Just below the heading')
+            ->set('bodyImage', UploadedFile::fake()->image('chart.png', 800, 400))
+            ->set('bodyImageAlt', 'A chart')
+            ->set('bodyImagePlacement', 'section-end:findings')
+            ->call('insertBodyImage')
+            ->assertHasNoErrors()
+            ->assertNotDispatched('markdown-insert')
+            ->assertDispatched('markdown-set', fn (string $event, array $params): bool => $params['editor'] === 'body')
+            ->assertSet('bodyImagePlacement', 'cursor')
+            ->assertSet('body', fn (string $body): bool => preg_match('#The data\.\n\n!\[A chart\]\(/storage/articles/body/[^)]+\.webp\)\n\n\#\# Outlook#', $body) === 1);
+    }
+
+    public function test_supporting_image_can_link_to_an_online_image_without_storing_a_file(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test(Form::class)
+            ->set('body', "## Findings\n\nThe data.")
+            ->set('bodyImageSource', 'link')
+            ->set('bodyImageUrl', 'https://images.example.com/chart_(2026).png')
+            ->set('bodyImageAlt', 'A chart')
+            ->set('bodyImageCaption', 'Source: Example')
+            ->set('bodyImagePlacement', 'below:findings')
+            ->call('insertBodyImage')
+            ->assertHasNoErrors()
+            ->assertSet('body', "## Findings\n\n![A chart](https://images.example.com/chart_%282026%29.png \"Source: Example\")\n\nThe data.\n")
+            ->assertSet('bodyImageUrl', '');
+
+        $this->assertCount(0, Storage::disk('public')->allFiles());
+    }
+
+    public function test_editor_shows_previews_for_linked_and_attached_images(): void
+    {
+        Livewire::test(Form::class)
+            ->set('bodyImageSource', 'link')
+            ->assertSee('Loading preview…')
+            ->assertSee('did not load as an image')
+            ->assertSee('Images in this article')
+            ->assertSee('Missing alt text');
+    }
+
+    public function test_linked_image_must_be_a_web_address(): void
+    {
+        foreach (['', 'javascript:alert(1)', 'ftp://example.com/a.png', 'https://example.com/my photo.png'] as $address) {
+            Livewire::test(Form::class)
+                ->set('bodyImageSource', 'link')
+                ->set('bodyImageUrl', $address)
+                ->set('bodyImageAlt', 'Alt')
+                ->call('insertBodyImage')
+                ->assertHasErrors('bodyImageUrl')
+                ->assertNotDispatched('markdown-insert');
+        }
+    }
+
+    public function test_supporting_image_placement_must_match_a_current_section(): void
+    {
+        Storage::fake('public');
+
+        Livewire::test(Form::class)
+            ->set('body', "## Findings\n\nThe data.")
+            ->set('bodyImage', UploadedFile::fake()->image('chart.png'))
+            ->set('bodyImageAlt', 'A chart')
+            ->set('bodyImagePlacement', 'below:removed-section')
+            ->call('insertBodyImage')
+            ->assertHasErrors('bodyImagePlacement')
+            ->assertNotDispatched('markdown-set');
+
+        $this->assertCount(0, Storage::disk('public')->files('articles/body'));
     }
 
     public function test_supporting_image_needs_alt_text_and_a_file(): void

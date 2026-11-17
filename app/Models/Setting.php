@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksLiveUpdates;
 use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 class Setting extends Model
 {
     /** @use HasFactory<SettingFactory> */
-    use HasFactory;
+    use HasFactory, TracksLiveUpdates;
 
     private const CACHE_KEY = 'site-settings';
 

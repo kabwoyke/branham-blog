@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Subscribers;
 
+use App\Livewire\Concerns\PollsForChanges;
 use App\Models\Subscriber;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -14,7 +15,7 @@ use Livewire\WithPagination;
 #[Title('Subscribers')]
 class Index extends Component
 {
-    use WithPagination;
+    use PollsForChanges, WithPagination;
 
     #[Url(as: 'q')]
     public string $search = '';
@@ -28,7 +29,15 @@ class Index extends Component
     {
         Subscriber::findOrFail($subscriberId)->delete();
 
-        session()->flash('status', 'Subscriber removed.');
+        $this->dispatch('notify', type: 'status', message: 'Subscriber removed.');
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function liveTopics(): array
+    {
+        return ['subscribers'];
     }
 
     public function render(): View

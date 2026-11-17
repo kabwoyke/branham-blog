@@ -15,6 +15,7 @@ use App\Livewire\Admin\Comments\Index as CommentIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Login;
 use App\Livewire\Admin\Messages\Index as MessageIndex;
+use App\Livewire\Admin\Password;
 use App\Livewire\Admin\Settings;
 use App\Livewire\Admin\Subscribers\Index as SubscriberIndex;
 use App\Livewire\Articles\Browse;
@@ -54,5 +55,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('messages', MessageIndex::class)->name('messages.index');
         Route::get('comments', CommentIndex::class)->name('comments.index');
         Route::get('settings', Settings::class)->name('settings');
+        Route::get('password', Password::class)->name('password');
     });
 });

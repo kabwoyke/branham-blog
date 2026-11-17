@@ -7,7 +7,9 @@ use App\Enums\ArticleType;
 use App\Models\Article;
 use App\Models\Category;
 use App\Support\ImageStore;
+use App\Support\Markdown;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -60,6 +62,18 @@ class Form extends Component
 
     public string $bodyImageCaption = '';
 
+    /**
+     * Where a supporting image comes from: "upload" (stored on the public disk) or "link" (an image already online).
+     */
+    public string $bodyImageSource = 'upload';
+
+    public string $bodyImageUrl = '';
+
+    /**
+     * Where a supporting image goes: "cursor", "start", "end", "below:{section}" or "section-end:{section}".
+     */
+    public string $bodyImagePlacement = 'cursor';
+
     public int $imageInputVersion = 0;
 
     public function mount(?Article $article = null): void
@@ -76,7 +90,7 @@ class Form extends Component
                 'category_id' => $article->category_id,
                 'type' => $article->type->value,
                 'status' => $article->status->value,
-                'published_at' => $article->published_at?->format('Y-m-d\TH:i'),
+                'published_at' => $article->published_at?->copy()->setTimezone(self::publishingTimezone())->format('Y-m-d\TH:i'),
                 'is_featured' => $article->is_featured,
                 'meta_title' => (string) $article->meta_title,
                 'meta_description' => (string) $article->meta_description,
@@ -129,6 +143,13 @@ class Form extends Component
         $this->imageInputVersion++;
     }
 
+    public function updatedBodyImageSource(): void
+    {
+        $this->reset('bodyImage', 'bodyImageUrl');
+        $this->resetErrorBag(['bodyImage', 'bodyImageUrl']);
+        $this->imageInputVersion++;
+    }
+
     public function updatedBodyImage(): void
     {
         try {
@@ -141,19 +162,39 @@ class Form extends Component
     }
 
     /**
-     * @return array<string, list<string>>
+     * @return array<string, list<mixed>>
      */
     private function bodyImageRules(): array
     {
         return [
-            'bodyImage' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'bodyImageSource' => ['required', 'in:upload,link'],
+            'bodyImage' => $this->bodyImageSource === 'upload' ? ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'] : ['nullable'],
+            'bodyImageUrl' => $this->bodyImageSource === 'link' ? ['required', 'string', 'max:2048', 'url:http,https', 'not_regex:/\s/'] : ['nullable'],
             'bodyImageAlt' => ['required', 'string', 'max:255'],
             'bodyImageCaption' => ['nullable', 'string', 'max:255'],
+            'bodyImagePlacement' => ['required', Rule::in($this->bodyImagePlacements())],
         ];
     }
 
     /**
-     * Store a supporting image and insert it into the editor as Markdown at the cursor.
+     * Every valid placement value for the current body.
+     *
+     * @return list<string>
+     */
+    private function bodyImagePlacements(): array
+    {
+        $placements = ['cursor', 'start', 'end'];
+
+        foreach (Markdown::sections($this->body) as $section) {
+            $placements[] = 'below:'.$section['key'];
+            $placements[] = 'section-end:'.$section['key'];
+        }
+
+        return $placements;
+    }
+
+    /**
+     * Store a supporting image and place it in the body: at the editor cursor, or in the chosen section.
      */
     public function insertBodyImage(): void
     {
@@ -163,14 +204,26 @@ class Form extends Component
 
         $this->validate($this->bodyImageRules(), [
             'bodyImage.required' => 'Choose an image to upload.',
+            'bodyImageUrl.required' => 'Paste the address of the image.',
+            'bodyImageUrl.url' => 'Enter a full image address starting with https://.',
+            'bodyImageUrl.not_regex' => 'The image address cannot contain spaces.',
             'bodyImageAlt.required' => 'Describe the image in the alt text field.',
+            'bodyImagePlacement.in' => 'That section is no longer in the article. Choose another place.',
         ]);
 
-        $url = Storage::disk(ImageStore::DISK)->url(ImageStore::store($this->bodyImage, 'articles/body'));
+        $url = $this->bodyImageSource === 'link'
+            ? str_replace(['(', ')'], ['%28', '%29'], $this->bodyImageUrl)
+            : Storage::disk(ImageStore::DISK)->url(ImageStore::store($this->bodyImage, 'articles/body'));
+        $markdown = $this->imageMarkdown($url);
 
-        $this->dispatch('markdown-insert', editor: 'body', markdown: $this->imageMarkdown($url));
+        if ($this->bodyImagePlacement === 'cursor') {
+            $this->dispatch('markdown-insert', editor: 'body', markdown: $markdown);
+        } else {
+            $this->body = Markdown::insertAt($this->body, $this->bodyImagePlacement, $markdown);
+            $this->dispatch('markdown-set', editor: 'body', markdown: $this->body);
+        }
 
-        $this->reset('bodyImage', 'bodyImageAlt', 'bodyImageCaption');
+        $this->reset('bodyImage', 'bodyImageUrl', 'bodyImageAlt', 'bodyImageCaption', 'bodyImagePlacement');
     }
 
     private function imageMarkdown(string $url): string
@@ -203,7 +256,17 @@ class Form extends Component
             'category_id' => ['required', Rule::exists('categories', 'id')],
             'type' => ['required', Rule::enum(ArticleType::class)],
             'status' => ['required', Rule::enum(ArticleStatus::class)],
-            'published_at' => [Rule::requiredIf($this->status === ArticleStatus::Scheduled->value), 'nullable', 'date', $this->status === ArticleStatus::Scheduled->value ? 'after:now' : 'date'],
+            'published_at' => [
+                'bail',
+                Rule::requiredIf($this->status === ArticleStatus::Scheduled->value),
+                'nullable',
+                'date',
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if ($this->status === ArticleStatus::Scheduled->value && ! $this->scheduledPublishAt()->isFuture()) {
+                        $fail('A scheduled article needs a publish date in the future.');
+                    }
+                },
+            ],
             'is_featured' => ['boolean'],
             'meta_title' => ['nullable', 'string', 'max:70'],
             'meta_description' => ['nullable', 'string', 'max:160'],
@@ -219,7 +282,6 @@ class Form extends Component
     {
         return [
             'featured_image_alt.required' => 'Describe the image in the alt text field.',
-            'published_at.after' => 'A scheduled article needs a publish date in the future.',
             'slug.regex' => 'Use lowercase letters, numbers and single hyphens only.',
         ];
     }
@@ -263,10 +325,23 @@ class Form extends Component
     private function resolvePublishedAt(ArticleStatus $status, Article $article): ?Carbon
     {
         return match ($status) {
-            ArticleStatus::Scheduled => Carbon::parse($this->published_at),
+            ArticleStatus::Scheduled => $this->scheduledPublishAt(),
             ArticleStatus::Published => $article->published_at ?? now(),
             ArticleStatus::Draft => null,
         };
+    }
+
+    /**
+     * The publish time the author entered, read as East Africa Time and converted to the app timezone for storage.
+     */
+    private function scheduledPublishAt(): Carbon
+    {
+        return Carbon::parse($this->published_at, self::publishingTimezone())->setTimezone(config('app.timezone'));
+    }
+
+    public static function publishingTimezone(): string
+    {
+        return (string) config('app.publishing_timezone', 'Africa/Nairobi');
     }
 
     private function applyImage(Article $article): void
@@ -298,6 +373,7 @@ class Form extends Component
             'categories' => Category::orderBy('name')->get(),
             'types' => ArticleType::cases(),
             'statuses' => ArticleStatus::cases(),
+            'bodySections' => Markdown::sections($this->body),
         ])->title($this->article ? 'Edit article' : 'New article');
     }
 }

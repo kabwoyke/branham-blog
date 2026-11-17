@@ -3,6 +3,7 @@
 namespace App\Livewire\Articles;
 
 use App\Enums\ArticleType;
+use App\Livewire\Concerns\PollsForChanges;
 use App\Models\Article;
 use App\Models\Category;
 use App\Support\ArticleSearch;
@@ -19,7 +20,7 @@ use Livewire\WithPagination;
  */
 class Browse extends Component
 {
-    use WithPagination;
+    use PollsForChanges, WithPagination;
 
     public const PER_PAGE = 9;
 
@@ -57,6 +58,14 @@ class Browse extends Component
     public function paginationView(): string
     {
         return 'pagination.editorial-livewire';
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function liveTopics(): array
+    {
+        return ['articles', 'categories'];
     }
 
     public function render(): View

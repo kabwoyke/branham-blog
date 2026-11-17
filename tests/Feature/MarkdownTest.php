@@ -59,4 +59,27 @@ class MarkdownTest extends TestCase
 
         $this->assertStringContainsString('<em>world</em>', $article->body_html);
     }
+
+    public function test_sections_are_listed_from_h2_and_h3_headings_outside_code(): void
+    {
+        $markdown = "Intro\n\n## Trust & Power\n\nText\n\n```\n## Not a heading\n```\n\n### Detail\n\n## Trust & Power";
+
+        $sections = Markdown::sections($markdown);
+
+        $this->assertSame(['trust-power', 'detail', 'trust-power-2'], array_column($sections, 'key'));
+        $this->assertSame([2, 3, 2], array_column($sections, 'level'));
+        $this->assertStringContainsString('id="trust-power-2"', Markdown::toHtml($markdown));
+    }
+
+    public function test_snippets_are_inserted_at_the_chosen_place(): void
+    {
+        $markdown = "Intro\n\n## One\n\nFirst.\n\n### Sub\n\nDeeper.\n\n## Two\n\nSecond.";
+
+        $this->assertStringStartsWith("IMG\n\nIntro\n\n## One", Markdown::insertAt($markdown, 'start', 'IMG'));
+        $this->assertStringEndsWith("Second.\n\nIMG\n", Markdown::insertAt($markdown, 'end', 'IMG'));
+        $this->assertStringContainsString("## One\n\nIMG\n\nFirst.", Markdown::insertAt($markdown, 'below:one', 'IMG'));
+        $this->assertStringContainsString("Deeper.\n\nIMG\n\n## Two", Markdown::insertAt($markdown, 'section-end:one', 'IMG'));
+        $this->assertStringContainsString("Deeper.\n\nIMG\n\n## Two", Markdown::insertAt($markdown, 'section-end:sub', 'IMG'));
+        $this->assertStringEndsWith("Second.\n\nIMG\n", Markdown::insertAt($markdown, 'section-end:two', 'IMG'));
+    }
 }

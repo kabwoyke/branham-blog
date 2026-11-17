@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.10s.visible="checkForChanges">
     <h1 class="text-2xl font-bold sm:text-3xl">Messages</h1>
 
     <label class="mt-4 flex items-center gap-2 text-sm">

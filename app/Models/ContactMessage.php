@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksLiveUpdates;
 use Database\Factories\ContactMessageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 class ContactMessage extends Model
 {
     /** @use HasFactory<ContactMessageFactory> */
-    use HasFactory;
+    use HasFactory, TracksLiveUpdates;
 
     /**
      * @return array<string, string>

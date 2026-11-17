@@ -18,6 +18,10 @@ class SettingSeeder extends Seeder
         'contact_email' => 'branham@narrisinternational.com',
         'contact_phone' => '0111429478',
         'linkedin_url' => '',
+        'x_url' => '',
+        'instagram_url' => '',
+        'tiktok_url' => '',
+        'facebook_url' => '',
         'about_content' => "Branham Samwel is a business analyst and social researcher.\n\nThis space is for his own thinking: observations from everyday life, what they could mean for society and for business, and where emerging patterns might lead.\n\nThe future is largely unpredictable, but there is real value in anticipating it.",
     ];
 

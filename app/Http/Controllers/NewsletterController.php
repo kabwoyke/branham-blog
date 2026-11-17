@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subscriber;
+use App\Support\LiveUpdates;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -35,7 +36,9 @@ class NewsletterController extends Controller
 
     public function unsubscribe(string $token): RedirectResponse
     {
-        Subscriber::where('unsubscribe_token', $token)->delete();
+        if (Subscriber::where('unsubscribe_token', $token)->delete() > 0) {
+            LiveUpdates::touch('subscribers');
+        }
 
         return redirect()->route('home')->with('status', 'You have been unsubscribed.');
     }

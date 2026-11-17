@@ -74,6 +74,13 @@ return [
     'timezone' => 'UTC',
 
     /*
+    | The timezone the author schedules and reads publish times in (East Africa Time).
+    | Dates are still stored in the "timezone" above.
+    */
+
+    'publishing_timezone' => env('APP_PUBLISHING_TIMEZONE', 'Africa/Nairobi'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------

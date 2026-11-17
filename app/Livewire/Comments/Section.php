@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Comments;
 
+use App\Livewire\Concerns\PollsForChanges;
 use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Contracts\View\View;
@@ -11,6 +12,8 @@ use Livewire\Component;
 
 class Section extends Component
 {
+    use PollsForChanges;
+
     private const MAX_ATTEMPTS = 3;
 
     private const DECAY_SECONDS = 3600;
@@ -66,6 +69,14 @@ class Section extends Component
 
         $this->reset('name', 'email', 'body', 'website');
         $this->submitted = true;
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function liveTopics(): array
+    {
+        return ['comments'];
     }
 
     public function render(): View

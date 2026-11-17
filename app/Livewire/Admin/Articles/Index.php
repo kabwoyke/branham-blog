@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Articles;
 
 use App\Enums\ArticleStatus;
+use App\Livewire\Concerns\PollsForChanges;
 use App\Mail\ArticleNewsletter;
 use App\Models\Article;
 use App\Models\Category;
@@ -20,7 +21,7 @@ use Livewire\WithPagination;
 #[Title('Articles')]
 class Index extends Component
 {
-    use WithPagination;
+    use PollsForChanges, WithPagination;
 
     #[Url(as: 'q')]
     public string $search = '';
@@ -53,7 +54,7 @@ class Index extends Component
 
         $article->delete();
 
-        session()->flash('status', "\"{$article->title}\" moved to trash.");
+        $this->dispatch('notify', type: 'status', message: "\"{$article->title}\" moved to trash.");
     }
 
     public function restore(int $articleId): void
@@ -63,7 +64,7 @@ class Index extends Component
 
         $article->restore();
 
-        session()->flash('status', "\"{$article->title}\" restored.");
+        $this->dispatch('notify', type: 'status', message: "\"{$article->title}\" restored.");
     }
 
     public function sendNewsletter(int $articleId): void
@@ -72,7 +73,7 @@ class Index extends Component
         Gate::authorize('update', $article);
 
         if ($article->newsletter_sent_at !== null) {
-            session()->flash('status', "\"{$article->title}\" was already sent to subscribers.");
+            $this->dispatch('notify', type: 'status', message: "\"{$article->title}\" was already sent to subscribers.");
 
             return;
         }
@@ -86,7 +87,15 @@ class Index extends Component
 
         $article->forceFill(['newsletter_sent_at' => now()])->saveQuietly();
 
-        session()->flash('status', "\"{$article->title}\" queued for {$sent} ".str('subscriber')->plural($sent).'.');
+        $this->dispatch('notify', type: 'status', message: "\"{$article->title}\" queued for {$sent} ".str('subscriber')->plural($sent).'.');
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function liveTopics(): array
+    {
+        return ['articles', 'categories'];
     }
 
     public function render(): View

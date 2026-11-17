@@ -50,6 +50,10 @@
         @if ($image)
             <meta name="twitter:image" content="{{ $image }}">
         @endif
+        @if ($xHandle = rescue(fn () => \App\Support\SocialLinks::xHandle()))
+            <meta name="twitter:site" content="{{ $xHandle }}">
+            <meta name="twitter:creator" content="{{ $xHandle }}">
+        @endif
 
         @foreach ($schema as $graph)
             <script type="application/ld+json">{!! json_encode($graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>

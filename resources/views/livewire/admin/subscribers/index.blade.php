@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.10s.visible="checkForChanges">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h1 class="text-2xl font-bold sm:text-3xl">Subscribers</h1>
         <a href="{{ route('admin.subscribers.export') }}" class="rounded-lg border border-brand px-4 py-2 text-sm font-medium text-brand hover:bg-brand/10">Export CSV</a>

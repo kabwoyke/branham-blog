@@ -23,8 +23,15 @@
                         @endif
                     </li>
                 @endif
-                @if ($linkedin)
-                    <li><span class="block font-semibold">LinkedIn</span><a href="{{ $linkedin }}" rel="noopener" target="_blank" class="text-brand hover:underline">Connect on LinkedIn</a></li>
+                @if ($socialLinks)
+                    <li>
+                        <span class="block font-semibold">Social media</span>
+                        <ul class="mt-1 space-y-1">
+                            @foreach ($socialLinks as $social)
+                                <li><a href="{{ $social['url'] }}" rel="noopener me" target="_blank" class="text-brand hover:underline">{{ $social['label'] }}</a></li>
+                            @endforeach
+                        </ul>
+                    </li>
                 @endif
             </ul>
         </aside>

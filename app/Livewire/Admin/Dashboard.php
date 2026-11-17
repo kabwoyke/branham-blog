@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Enums\ArticleStatus;
+use App\Livewire\Concerns\PollsForChanges;
 use App\Models\Article;
 use App\Models\ArticleView;
 use App\Models\Comment;
@@ -17,6 +18,16 @@ use Livewire\Component;
 #[Title('Dashboard')]
 class Dashboard extends Component
 {
+    use PollsForChanges;
+
+    /**
+     * @return list<string>
+     */
+    protected function liveTopics(): array
+    {
+        return ['articles', 'subscribers', 'contact_messages', 'comments', 'article_views'];
+    }
+
     public function render(): View
     {
         return view('livewire.admin.dashboard', [

@@ -29,6 +29,7 @@ class AdminAccessTest extends TestCase
             'export' => ['admin.subscribers.export'],
             'messages' => ['admin.messages.index'],
             'settings' => ['admin.settings'],
+            'password' => ['admin.password'],
         ];
     }
 

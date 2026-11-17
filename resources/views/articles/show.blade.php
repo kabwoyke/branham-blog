@@ -112,20 +112,34 @@
         <div
             class="mt-14 flex flex-wrap items-center gap-3 border-t border-muted/20 pt-6"
             x-data="{
-                copied: false,
-                copy() {
-                    navigator.clipboard.writeText(@js($url)).then(() => {
-                        this.copied = true
-                        setTimeout(() => this.copied = false, 2000)
-                    })
+                message: '',
+                timer: null,
+                flash(text) {
+                    this.message = text
+                    clearTimeout(this.timer)
+                    this.timer = setTimeout(() => this.message = '', 4000)
+                },
+                copy(text = 'Link copied') {
+                    navigator.clipboard.writeText(@js($url)).then(() => this.flash(text))
+                },
+                shareToApp(app) {
+                    if (navigator.share) {
+                        navigator.share({ title: @js($article->title), url: @js($url) }).catch(() => {})
+                        return
+                    }
+                    this.copy(`Link copied. Paste it into your ${app} post, story or bio.`)
                 },
             }"
         >
-            <span class="text-sm font-semibold">Share this article</span>
+            <span class="w-full text-sm font-semibold sm:w-auto">Share this article</span>
             <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode($url) }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline !px-4 !py-2">LinkedIn</a>
+            <a href="https://x.com/intent/post?text={{ urlencode($article->title) }}&url={{ urlencode($url) }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline !px-4 !py-2">X</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($url) }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline !px-4 !py-2">Facebook</a>
+            <button type="button" x-on:click="shareToApp('Instagram')" title="Opens your device's share menu, or copies the link" class="btn btn-outline !px-4 !py-2">Instagram</button>
+            <button type="button" x-on:click="shareToApp('TikTok')" title="Opens your device's share menu, or copies the link" class="btn btn-outline !px-4 !py-2">TikTok</button>
             <a href="mailto:?subject={{ rawurlencode($article->title) }}&body={{ rawurlencode($url) }}" class="btn btn-outline !px-4 !py-2">Email</a>
-            <button type="button" x-on:click="copy" class="btn btn-outline !px-4 !py-2">Copy link</button>
-            <span class="text-sm font-semibold text-brand" role="status" aria-live="polite" x-cloak x-show="copied">Copied</span>
+            <button type="button" x-on:click="copy()" class="btn btn-outline !px-4 !py-2">Copy link</button>
+            <span class="w-full text-sm font-semibold text-brand" role="status" aria-live="polite" x-cloak x-show="message" x-text="message"></span>
         </div>
 
         @if ($previous || $next)

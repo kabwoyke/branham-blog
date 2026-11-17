@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksLiveUpdates;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,8 @@ use Illuminate\Http\Request;
 #[Fillable(['article_id', 'viewed_on', 'views'])]
 class ArticleView extends Model
 {
+    use TracksLiveUpdates;
+
     public $timestamps = false;
 
     /**

@@ -1,6 +1,6 @@
 @php
     $contactEmail = rescue(fn () => \App\Models\Setting::get('contact_email'));
-    $linkedin = rescue(fn () => \App\Models\Setting::get('linkedin_url'));
+    $socialLinks = rescue(fn () => \App\Support\SocialLinks::filled(), []);
     $tagline = rescue(fn () => \App\Models\Setting::get('tagline'));
 @endphp
 
@@ -23,10 +23,16 @@
                 <li><a href="{{ route('about') }}" class="hover:text-white">About</a></li>
                 <li><a href="{{ route('contact') }}" class="hover:text-white">Contact</a></li>
                 <li><a href="{{ route('feed') }}" class="hover:text-white">RSS feed</a></li>
-                @if ($linkedin)
-                    <li><a href="{{ $linkedin }}" class="hover:text-white" rel="noopener" target="_blank">LinkedIn</a></li>
-                @endif
             </ul>
+
+            @if ($socialLinks)
+                <p class="mt-8 text-xs font-semibold uppercase tracking-[0.18em] text-white">Follow</p>
+                <ul class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                    @foreach ($socialLinks as $social)
+                        <li><a href="{{ $social['url'] }}" class="hover:text-white" rel="noopener me" target="_blank">{{ $social['label'] }}</a></li>
+                    @endforeach
+                </ul>
+            @endif
         </nav>
 
         <div>

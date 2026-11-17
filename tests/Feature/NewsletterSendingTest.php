@@ -61,6 +61,20 @@ class NewsletterSendingTest extends TestCase
         Mail::assertNothingQueued();
     }
 
+    public function test_newsletter_has_working_one_click_unsubscribe_headers(): void
+    {
+        $subscriber = Subscriber::factory()->create();
+        $headers = (new ArticleNewsletter(Article::factory()->create(), $subscriber))->headers()->text;
+
+        $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
+        $this->assertSame('<'.route('newsletter.unsubscribe.destroy', $subscriber->unsubscribe_token).'>', $headers['List-Unsubscribe']);
+
+        auth()->logout();
+        $this->post(trim($headers['List-Unsubscribe'], '<>'), ['List-Unsubscribe' => 'One-Click'])->assertRedirect();
+
+        $this->assertModelMissing($subscriber);
+    }
+
     public function test_newsletter_renders_article_link_and_unsubscribe_link(): void
     {
         $article = Article::factory()->create();

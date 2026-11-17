@@ -4,12 +4,19 @@
     <div
         wire:ignore
         x-on:markdown-insert.window="if ($event.detail.editor === '{{ $model }}') { insertMarkdown($event.detail.markdown) }"
+        x-on:markdown-set.window="if ($event.detail.editor === '{{ $model }}') { setMarkdown($event.detail.markdown) }"
         x-data="{
             editor: null,
             mode: 'markdown',
             range: null,
+            images: [],
+            failedImages: {},
             init() {
-                this.editor = window.makeMarkdownEditor(this.$refs.editor, $wire.{{ $model }}, (value) => { $wire.{{ $model }} = value })
+                this.editor = window.makeMarkdownEditor(this.$refs.editor, $wire.{{ $model }}, (value) => {
+                    $wire.{{ $model }} = value
+                    this.refreshImages(value)
+                })
+                this.refreshImages(this.editor.value())
                 try {
                     if (localStorage.getItem('editor-mode') === 'rich') { this.setMode('rich') }
                 } catch (e) {}
@@ -29,7 +36,20 @@
                 this.$nextTick(() => { mode === 'markdown' ? this.editor.codemirror.refresh() : this.$refs.rich.focus() })
             },
             syncFromRich() {
-                $wire.{{ $model }} = window.richText.htmlToMarkdown(this.$refs.rich)
+                const markdown = window.richText.htmlToMarkdown(this.$refs.rich)
+                $wire.{{ $model }} = markdown
+                this.refreshImages(markdown)
+            },
+            refreshImages(markdown) {
+                const pattern = /!\[([^\]]*)\]\(\s*<?([^\s)>]+)>?(?:\s+&quot;([^&quot;]*)&quot;)?\s*\)/g
+                const found = []
+                for (const match of (markdown || '').matchAll(pattern)) {
+                    const src = match[2]
+                    if (/^(https?:\/\/|\/)/i.test(src)) {
+                        found.push({ alt: match[1].trim(), src, caption: (match[3] || '').trim(), external: /^https?:\/\//i.test(src) && ! src.startsWith(window.location.origin) })
+                    }
+                }
+                this.images = found
             },
             saveRange() {
                 const selection = window.getSelection()
@@ -68,6 +88,14 @@
                 }
                 document.execCommand('insertHTML', false, window.richText.sanitizeHtml(this.editor.markdown(markdown)))
                 this.syncFromRich()
+            },
+            setMarkdown(markdown) {
+                this.editor.value(markdown)
+                this.refreshImages(markdown)
+                if (this.mode === 'rich') {
+                    this.$refs.rich.innerHTML = window.richText.sanitizeHtml(this.editor.markdown(markdown))
+                    this.range = null
+                }
             },
             pastePlain(event) {
                 event.preventDefault()
@@ -118,6 +146,34 @@
                 class="prose min-h-[420px] max-w-none rounded-b-lg border border-muted/40 bg-white p-4 focus:border-brand prose-headings:text-ink prose-a:text-brand"
             ></div>
         </div>
+
+        <section x-cloak x-show="images.length > 0" class="mt-3 rounded-lg border border-muted/30 bg-white p-3" aria-label="Images in the {{ strtolower($label) }}">
+            <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+                Images in this {{ strtolower($label) === 'body' ? 'article' : 'text' }} (<span x-text="images.length"></span>)
+            </p>
+            <ul class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                <template x-for="(image, index) in images" x-bind:key="index + image.src">
+                    <li class="min-w-0">
+                        <div class="relative flex aspect-video items-center justify-center overflow-hidden rounded-md bg-paper">
+                            <img
+                                x-bind:src="image.src"
+                                x-bind:alt="image.alt || 'Image without alt text'"
+                                x-show="! failedImages[image.src]"
+                                x-on:error="failedImages[image.src] = true"
+                                x-on:load="delete failedImages[image.src]"
+                                loading="lazy"
+                                referrerpolicy="no-referrer"
+                                class="size-full object-cover"
+                            >
+                            <p x-show="failedImages[image.src]" class="px-2 text-center text-xs text-red-700">Could not load this image</p>
+                            <span x-show="image.external" class="absolute left-1 top-1 rounded bg-ink/70 px-1.5 py-0.5 text-[0.65rem] font-semibold text-white">Linked</span>
+                        </div>
+                        <p class="mt-1 truncate text-xs" x-bind:title="image.alt" x-bind:class="image.alt ? 'text-ink' : 'text-red-700'" x-text="image.alt || 'Missing alt text'"></p>
+                        <p x-show="image.caption" class="truncate text-xs text-muted" x-bind:title="image.caption" x-text="image.caption"></p>
+                    </li>
+                </template>
+            </ul>
+        </section>
     </div>
     @error($model)
         <p class="mt-1 text-sm text-red-700">{{ $message }}</p>
